@@ -2,6 +2,27 @@
 library("dplyr")
 library("jsonlite")
 library("reactable")
+
+secrets <- function(prepend=NULL) {
+  path <- "./secrets.json"
+  if(!is.null(prepend)) {
+    path <- paste(prepend,"/secrets.json",sep="")
+  }
+  if (!file.exists(path)) {
+    stop("Can't find settings file")
+  }
+  jsonlite::read_json(path)
+}
+
+##Need to redirect for the log analyser.
+if(!grepl('scripts', getwd(), fixed=TRUE)) {
+  settings <- secrets('../../scripts')
+} else {
+  settings <- secrets()
+}
+
+reset_path <- paste(settings[[5]],"/components/logAnalyser", sep="")
+
 source(file="../../scripts/generate_models.R")
 source(file="../../scripts/generate_distributions.R")
 finals_adjust <- read.csv("../../data/finals_vars.csv")
@@ -295,6 +316,7 @@ parse_url <- function(url) {
 #####-----------------------------UI---------------------------------------
 
 ui <- function(req) {
+    setwd(reset_path)
     fluidPage(
     tags$head(includeHTML("google-analytics.html")),
     tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback", rel = "stylesheet"),
@@ -362,7 +384,7 @@ ui <- function(req) {
 #####----------------------------SERVER---------------------------------------
 
 server <- function(input,output,session) {
-
+  
   observeEvent(input$run, {
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
