@@ -1,0 +1,17 @@
+lookup,string
+damage_per_minute,Damage Done per Minute
+ka_d,KA/D
+kills_per_death,K/D
+kills_per_minute,Kills per Minute
+total_mins_played,Total Minutes Played (Season)
+heals_per_minute,Heals Received per Minute
+dt_per_minute,Damage Taken per Minute
+caps_per_minute,Captures per Minute
+deaths_per_minute,Deaths per Minute
+damage_per_heal,Damage Done per Heal Received
+damage_per_dt,Damage Done per Damage Taken
+dt_per_heal,Damage Taken per Heal Received
+ubers_per_minute,Ubers per Minute (Includes Kritz)
+healing_per_minute,Healing Done per Minute
+drops_per_minute,Drops per Minute
+drops_per_uber,Drops per Uber

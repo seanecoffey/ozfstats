@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+      <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163898992-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-163898992-1');
+        </script>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+        <meta name="description" content="Team Fortress 2 | ozfortress | rankings | statistics | metrics">
+        <meta property="og:site_name" content="ozfstats.com">
+        <meta property="og:title" content="Compare Players">
+        <meta property="og:type" content="website">
+        <meta property="og:description" content="Team Fortress 2 | ozfortress | rankings | statistics | metrics">
+        <meta property="og:url" content="https://ozfstats.com/">
+        <meta property="og:image" content="https://i.imgur.com/ll2qJAB.png">
+        <meta property="twitter:card" content="summary_large_image">
+        <title>Compare Players | ozfstats</title>
+        <link href="../assets/css/styles.css" rel="stylesheet" />
+        <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/js/all.min.js" crossorigin="anonymous"></script>
+    </head>
+    <body class="sb-nav-fixed">
+      <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+          <a class="navbar-brand" href="index.html">ozfstats.com</a><button class="btn btn-link btn-sm order-1 order-lg-0" id="sidebarToggle" href="#"><i class="fas fa-bars"></i></button
+          ><!-- Navbar Search-->
+          <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+              <div class="input-group">
+
+                  <div class="input-group-append">
+
+                  </div>
+              </div>
+          </form>
+          <!-- Navbar-->
+      </nav>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        <div class="nav">
+                            <div class="sb-sidenav-menu-heading">Rankings</div>
+                            <a class="nav-link" href="/currentrankings/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
+                                Current Rankings</a
+                            >
+                            <a class="nav-link" href="/interrankings/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-trophy"></i></div>
+                                IM Rankings</a
+                            >
+                            <a class="nav-link" href="/seasons/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-crown"></i></div>
+                                Season Rankings</a
+                            >
+                            <div class="sb-sidenav-menu-heading">Extras</div>
+							              <a class="nav-link" href="/compare/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-chart-pie"></i></div>
+                                Compare Players</a
+                            >
+                            <a class="nav-link" href="/loganalyser/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-calculator"></i></div>
+                                Log Analyser</a
+                            >
+                            <a class="nav-link" href="/explorer/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-chart-line"></i></div>
+                                Data Explorer</a
+                            >
+                            <div class="sb-sidenav-menu-heading">Info</div>
+                            <a class="nav-link" href="/blog/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-pen"></i></div>
+                                Blog</a
+                            >
+                            <a class="nav-link" href="/about/"
+                                ><div class="sb-nav-link-icon"><i class="fas fa-info-circle"></i></div>
+                                About</a
+                            >
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div id="layoutSidenav_content">
+                <main>
+                    <iframe id="compare" src="https://app.ozfstats.com/comparePlayers/" frameborder="0", style="overflow:hidden;overflow-x:hidden;overflow-y:hidden;height:100%;width:100%;position:relative;top:0px;left:0px;right:0px;bottom:0px" height="100%" width="100%">
+                    </iframe>
+                </main>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="../assets/js/scripts.js"></script>
+    </body>
+</html>
