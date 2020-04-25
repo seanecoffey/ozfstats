@@ -26,6 +26,9 @@ source(file="generate_player_profiles.R")
 setwd()
 setwd("./scripts")
 source(file="generate_data_explorer.R")
+setwd()
+setwd("./scripts")
+source(file="generate_player_names.R")
 
 rm(list=ls())
 
