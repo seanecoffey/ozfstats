@@ -5,6 +5,7 @@ library(plotly)
 library(rlist)
 library(Cairo)
 library(reactable)
+library(dplyr)
 options(shiny.usecairo=T)
 
 ##functions
@@ -105,6 +106,7 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
   #filtered_db <- filtered_db %>% group_by(ranking_game) %>% summarize(mean_variable = mean(get(variable)))
   #TO DO ADD INPUT/FILTER TO CHANGE VARIABLE
   #TO DO TOOLTIP LOGS.TF LINK
+  #TO DO ADD MARKER TO SEASON AVERAGE
   last_game <- last_game + 1
   season_avgs <- season_averages(filtered_db)
   fig <- plot_ly(data = filtered_db, type='scatter', mode="markers")
@@ -139,6 +141,7 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
 
 ##UI
 ui <- fluidPage(
+  tags$title('Player Profiles | ozfstats'),
   tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
   uiOutput('titleheader'),
   hr(),
@@ -197,7 +200,7 @@ server <- function(input, output, session) {
   last_game <- max(db$ranking_game)
   ##Render UI only once database is loaded.
   output$nameSelect <- renderUI({
-    selectInput('player', 'Player',choices=names,multiple=F, selected=NULL)
+    selectizeInput('player', 'Player',choices=names, multiple = F, selected=NULL)
   })
 
   output$classSelectFilter <- renderUI({
@@ -216,7 +219,7 @@ server <- function(input, output, session) {
   observeEvent(input$player ,{
     output$titleheader <- renderUI({
       text <- paste("Player Profile  |  ", input$player, sep="")
-      titlePanel(text)
+      h2(text)
     })
 
     player_db <- player_filter(db, input$player, input$classFilter)
