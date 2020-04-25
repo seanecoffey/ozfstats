@@ -167,9 +167,10 @@ server <- function(input,output,session) {
                           headerStyle = list(fontWeight = 700),
                           minWidth = 200,
                           cell = function(value, index) {
+                          profile_url <- sprintf('https://app.ozfstats.com/playerProfiles/?_inputs_&classFilter="All"&player="%s"',value)
                             div(
                               class = "name",
-                              div(class = "player-name", value),
+                              div(class = "player-name", htmltools::tags$a(href = profile_url, target = "_blank", value)),
                               div(class = "class", sprintf("%s", data[index,"classes"]))
                             )
                           }
