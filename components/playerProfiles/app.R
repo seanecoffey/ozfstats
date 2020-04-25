@@ -375,7 +375,6 @@ server <- function(input, output, session) {
 
     output$timeseries <- renderPlotly({time_performance_graph(player_db, "gamescore", last_game)})
   })
-
 }
 
 shinyApp(ui,server, enableBookmarking = "url")
