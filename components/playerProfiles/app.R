@@ -106,14 +106,14 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
   #filtered_db <- filtered_db %>% group_by(ranking_game) %>% summarize(mean_variable = mean(get(variable)))
   #TO DO ADD INPUT/FILTER TO CHANGE VARIABLE
   #TO DO TOOLTIP LOGS.TF LINK
-  #TO DO ADD MARKER TO SEASON AVERAGE
   last_game <- last_game + 1
   season_avgs <- season_averages(filtered_db)
   fig <- plot_ly(data = filtered_db, type='scatter', mode="markers")
 
   fig <- fig %>% add_trace(x=~ranking_game, y=~get(variable), color=~class_primary, mode="markers")
 
-  fig <- fig %>% add_trace(data = season_avgs, x=~ranking_game, y=~gamescore, mode='lines', name = "Season Average", showlegend=FALSE)
+  fig <- fig %>% add_trace(data = season_avgs, x=~ranking_game, y=~gamescore, mode='lines+markers', name = "Season Average", 
+                           line = list(color="rgba(129, 33, 255, 0.5"),marker = list(color="rgba(129, 33, 255, 0.5"))
 
   fig <- fig %>% layout(xaxis=list(range = c(0,last_game), showticklabels=FALSE, title="Season"), yaxis=list(range=c(0,95), title=variable),
                         shapes = list(
@@ -135,62 +135,75 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
   fig <- fig %>% add_text( x = (last_game/2), y=82.5, text = "Top 90% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
   fig <- fig %>% add_text( x = (last_game/2), y=36.25, text = "Bottom 30% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
   fig <- fig %>% add_text( x = (last_game/2), y=17.5, text = "Bottom 10% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
-
+  fig <- fig %>% config(displaylogo = FALSE)
   return(fig)
 }
 
 ##UI
-ui <- fluidPage(
-  tags$title('Player Profiles | ozfstats'),
-  tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
-  uiOutput('titleheader'),
-  hr(),
-  fluidRow(
-    column(2,
-           fluidRow(
-             column(12, htmlOutput('classImage'))
+ui <- function(req) {
+  fluidPage(
+    tags$title('Player Profiles | ozfstats'),
+    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
+    tags$script('
+        if(self != top) {
+        var style = document.createElement("style");
+        style.innerHTML = `
+          #url-back-button {
+            display:none !important;
+          }
+        `;
+        document.head.appendChild(style)
+        }
+    '),
+    uiOutput('titleheader'),
+    hr(),
+    fluidRow(
+      column(2,
+             fluidRow(
+               column(12, htmlOutput('classImage'))
+               )
+             ),
+      column(2,
+             fluidRow(
+               column(12,uiOutput('nameSelect'))
+               ),
+             fluidRow(
+               column(12,uiOutput('classSelectFilter'))
+               ),
+             hr(),
+             fluidRow(
+               column(12,
+                      textOutput('totalGames')
+                      ),
+               ),
+             fluidRow(
+               column(12,
+                      textOutput('winPercentage')
+                      )
+               ),
+             fluidRow(
+               column(12,
+                      textOutput('seasonsPlayed')
+                      )
+               )
+             ),
+      column(8,
+             fluidRow(
+               column(12,reactableOutput('mapTable'))
+               )
              )
-           ),
-    column(2,
-           fluidRow(
-             column(12,uiOutput('nameSelect'))
-             ),
-           fluidRow(
-             column(12,uiOutput('classSelectFilter'))
-             ),
-           hr(),
-           fluidRow(
-             column(12,
-                    textOutput('totalGames')
-                    ),
-             ),
-           fluidRow(
-             column(12,
-                    textOutput('winPercentage')
-                    )
-             ),
-           fluidRow(
-             column(12,
-                    textOutput('seasonsPlayed')
-                    )
-             )
-           ),
-    column(8,
-           fluidRow(
-             column(12,reactableOutput('mapTable'))
-             )
-           )
+      ),
+    hr(),
+    fluidRow(
+      plotlyOutput('timeseries')
+      ),
+    fluidRow(column(6,
+                    a(href="https://ozfstats.com/", "Back to ozfstats.com")
+    ), class="back-button", id="url-back-button"
     ),
-  hr(),
-  fluidRow(
-    column(5,
-           verbatimTextOutput('classGames')
-           )
-    ),
-  fluidRow(
-    plotlyOutput('timeseries')
+    br()
     )
-  )
+}
 
 ##SERVER
 
@@ -198,6 +211,25 @@ server <- function(input, output, session) {
   db <- load_database()
   names <- get_names(db)
   last_game <- max(db$ranking_game)
+  
+  plotly_verbose <- c('plotly_hover', 'plotly_click', 'plotly_selected', 'plotly_relayout')
+  setBookmarkExclude(c(
+    '.clientValue-default-plotlyCrosstalkOpts',
+    sprintf('.clientValue-%s-pop_hist', plotly_verbose),
+    'plotly_afterplot-A', 'plotly_relayout-A', 'plotly_hover-A', 'shareUrl'
+  ))
+  
+  #bookmark on input change
+  observe({
+    reactiveValuesToList(input)
+    session$doBookmark()
+  })
+  
+  #update url on input change
+  onBookmarked(function(url) {
+    updateQueryString(url)
+  })
+  
   ##Render UI only once database is loaded.
   output$nameSelect <- renderUI({
     selectizeInput('player', 'Player',choices=names, multiple = F, selected=NULL)
@@ -262,6 +294,7 @@ server <- function(input, output, session) {
     })
 
     output$timeseries <- renderPlotly({time_performance_graph(player_db, "gamescore", last_game)})
+    
     updateSelectInput(session, "classFilter", selected = "All")
   })
 
@@ -305,4 +338,4 @@ server <- function(input, output, session) {
 
 }
 
-shinyApp(ui,server)
+shinyApp(ui,server, enableBookmarking = "url")
