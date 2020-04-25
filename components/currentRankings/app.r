@@ -23,52 +23,37 @@ ui <- fluidPage(
   waiter_show_on_load(
     spin_loaders(37),
     color="#212529"
-  ),
-    tags$script('
-        setHeight = function() {
-          var window_height = $(window).height();
-          var header_height = $(".main-header").height();
-          # var window_width = $(window).width();
-          var boxHeight = window_height;
-          var setHeight = Math.min([boxHeight,window_width])
-          $("#sidebar-div").height(boxHeight);
-          $("#plot-div").height(setHeight);
-        };
-
-        // Set input$box_height when the connection is established
-        $(document).on("shiny:connected", function(event) {
-          setHeight();
-        });
-
-        // Refresh the box height on every window resize event
-        $(window).on("resize", function(){
-          setHeight();
-        });
-      '),
-    tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback", rel = "stylesheet"),
-    tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
-      column(12,
-              fluidRow(column(width=12,
-                              div(class = "title",
-                                  h2("Current Player Rankings"),
-                                  "Current weighted player rankings using a 2 season rolling window. Maps played indicates number of maps within this rolling window.  The class next to each player is the one they played the most that season."
-                              )
-              )
-              ),
-              fluidRow(column(
-                width=12,
-                reactableOutput("rankingtable"))),
-                fluidRow(column(width=10,
-                                textOutput("edit_date")
-              ),
-              column(width=2, div(
-                div(" >70%    Elite",class="r1"),
-                div(" >60%    Above Average",class="r2"),
-                div(" 60%-40%  Average",class="r3"),
-                div(" <40%    Below Average",class="r4"),
-                div(" <30%    Poor",class="r5")
-                ), "align"="right")
-              ), "class"="standings")
+    ),
+  tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback", rel = "stylesheet"),
+  tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
+  column(12,
+         fluidRow(column(width=12,
+                         div(class = "title", h2("Current Premier Player Rankings"))
+                         )
+                  ),
+         fluidRow(column(12,
+                         reactableOutput("rankingtable"))
+                  ),
+         fluidRow(column(12,
+                         fluidRow(column(10,
+                                         fluidRow(textOutput("edit_date")),
+                                         fluidRow(
+                                           div(class = "title",
+                                               p("Current weighted player rankings using a 2 season rolling window. Click player name for link to player statistics profile."),
+                                               p("See the about section for details on how the rankings are calculated.")
+                                               )
+                                           )
+                                         ),
+                                  column(width=2, div(
+                                    div(" >70%    Elite",class="r1"),
+                                    div(" >60%    Above Average",class="r2"),
+                                    div(" 60%-40%  Average",class="r3"),
+                                    div(" <40%    Below Average",class="r4"),
+                                    div(" <30%    Poor",class="r5")
+                                    ), "align"="right")
+                                  )
+                         )
+                  ), "class"="standings")
   )
 
 
@@ -213,9 +198,11 @@ server <- function(input,output,session) {
                           headerStyle=list(fontWeight=700),
                           minWidth = 200,
                           cell = function(value, index) {
+                            profile_url <- sprintf('https://app.ozfstats.com/playerProfiles/?_inputs_&classFilter="All"&player="%s"',value)
                             div(
                               class = "name",
-                              div(class = "player-name",value),
+                              div(class = "player-name",
+                                  htmltools::tags$a(href = profile_url, target = "_blank", value)),
                               div(class = "class", sprintf("%s", current_rankings[index, "classes"]))
                             )
                           }

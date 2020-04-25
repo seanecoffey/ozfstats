@@ -186,3 +186,8 @@ h1.title {
 
 
 /*NEW */
+
+a {
+  color:inherit;
+  text-decoration: inherit;
+}
