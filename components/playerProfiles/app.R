@@ -113,13 +113,23 @@ season_averages <- function(player_db) {
   return(by_season)
 }
 
-time_performance_graph <- function(filtered_db, variable, last_game) {
+time_performance_graph <- function(filtered_db, variable, last_game, updateProgress = NULL) {
+  if(is.function(updateProgress)) {
+    text <- "Destabilizing Orbital Payloads"
+    updateProgress(detail = text)
+    Sys.sleep(0.1)
+  }
   #TO DO: ADD TOGGLE FOR SERIES/MAP
   #filtered_db <- filtered_db %>% group_by(ranking_game) %>% summarize(mean_variable = mean(get(variable)))
   #TO DO ADD INPUT/FILTER TO CHANGE VARIABLE
   #TO DO TOOLTIP LOGS.TF LINK
   last_game <- last_game + 1
   season_avgs <- season_averages(filtered_db)
+  if(is.function(updateProgress)) {
+    text <- "Preparing Captive Simulators"
+    updateProgress(detail = text)
+    Sys.sleep(0.1)
+  }
   
   fig <- plot_ly(data = filtered_db, type='scatter', mode="markers", hoverinfo='y', hoverlabel=list(namelength=0))
 
@@ -154,6 +164,11 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
                                            x0=0, x1=last_game,xref="x", y0=70, y1=100, yref="y", name="Elite")
                                       )
                         )
+  if(is.function(updateProgress)) {
+    text <- "Partitioning Social Network"
+    updateProgress(detail = text)
+    Sys.sleep(0.1)
+  }
   fig <- fig %>% add_annotations(x = seq(5,last_game,10), y=5, text=seq(14,27), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
   
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db$gamescore, text=paste("<a href='https://logs.tf/",filtered_db$log_id,"'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
@@ -163,6 +178,11 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
   fig <- fig %>% add_text( x = (last_game/2), y=36.25, text = "Bottom 30% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
   fig <- fig %>% add_text( x = (last_game/2), y=17.5, text = "Bottom 10% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
   fig <- fig %>% config(displaylogo = FALSE)
+  if(is.function(updateProgress)) {
+    text <- "Blurring Reality Lines"
+    updateProgress(detail = text)
+    Sys.sleep(0.1)
+  }
   return(fig)
 }
 
@@ -257,7 +277,6 @@ server <- function(input, output, session) {
     reactiveValuesToList(input)
     session$doBookmark()
   })
-  
   #update url on input change
   onBookmarked(function(url) {
     updateQueryString(url)
@@ -267,7 +286,6 @@ server <- function(input, output, session) {
   output$nameSelect <- renderUI({
     selectInput('player', 'Player',choices=names, multiple = F, selected=NULL)
   })
-
   output$classSelectFilter <- renderUI({
     selectInput('classFilter', 'Class', choices = c(
       'All',
@@ -277,8 +295,6 @@ server <- function(input, output, session) {
       'medic'
     ), selected='All', multiple = FALSE)
   })
-
-
 
   #Change outputs when player is selected
   observeEvent(input$player ,{
@@ -333,7 +349,24 @@ server <- function(input, output, session) {
       c('<img src=',imgpath, 'class=class-image','>')
     })
 
-    output$timeseries <- renderPlotly({time_performance_graph(player_db, "gamescore", last_game)})
+    output$timeseries <- renderPlotly({
+      progress <- shiny::Progress$new()
+      progress$set(message = "... ", value = 0)
+      on.exit(progress$close())
+      
+      updateProgress <- function(value = NULL, detail = NULL) {
+        if(is.null(value)) {
+          value <- progress$getValue()
+          value <- value + (progress$getMax() - value)/5
+        }
+        progress$set(value = value, detail = detail)
+      }
+      
+      text <- "Reticulating Splines"
+      updateProgress(detail = text)
+      Sys.sleep(0.3)
+      
+      time_performance_graph(player_db, "gamescore", last_game, updateProgress)})
     
     updateSelectInput(session, "classFilter", selected = "All")
   })
@@ -373,7 +406,25 @@ server <- function(input, output, session) {
       c('<img src=',imgpath, 'class=class-image','>')
     })
 
-    output$timeseries <- renderPlotly({time_performance_graph(player_db, "gamescore", last_game)})
+    output$timeseries <- renderPlotly({
+      progress <- shiny::Progress$new()
+      progress$set(message = "... ", value = 0)
+      on.exit(progress$close())
+      
+      
+      updateProgress <- function(value = NULL, detail = NULL) {
+        if(is.null(value)) {
+          value <- progress$getValue()
+          value <- value + (progress$getMax() - value)/5
+        }
+        progress$set(value = value, detail = detail)
+      }
+      
+      text <- "Reticulating Splines"
+      updateProgress(detail = text)
+      Sys.sleep(0.3)
+      
+      time_performance_graph(player_db, "gamescore", last_game, updateProgress)})
   })
 }
 
