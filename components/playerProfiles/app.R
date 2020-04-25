@@ -9,6 +9,18 @@ library(dplyr)
 options(shiny.usecairo=T)
 
 ##functions
+player_names <- read.csv('../../data/players.csv')
+
+convert_steam_id3 <- function(steamid) {
+  steamid64ident <- bit64::as.integer64(76561197960265728)
+  commid <- gsub('\\[','', steamid)
+  commid <- gsub('\\]','', commid)
+  commid <- unlist(strsplit(commid, ":"))[[3]]
+  commid <- bit64::as.integer64(commid)
+  commid <- commid + steamid64ident
+  return(commid)
+}
+
 load_database <- function() {
   db <- read.csv('../../data/detailed_stats.csv')
   return(db)
@@ -108,9 +120,22 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
   #TO DO TOOLTIP LOGS.TF LINK
   last_game <- last_game + 1
   season_avgs <- season_averages(filtered_db)
-  fig <- plot_ly(data = filtered_db, type='scatter', mode="markers")
+  
+  fig <- plot_ly(data = filtered_db, type='scatter', mode="markers", hoverinfo='y', hoverlabel=list(namelength=0))
 
-  fig <- fig %>% add_trace(x=~ranking_game, y=~get(variable), color=~class_primary, mode="markers")
+  fig <- fig %>% add_trace(x=~ranking_game, y=~get(variable), color=~class_primary, mode="markers", marker = list(size = 8),
+                           text = paste("Season ", filtered_db$season, " Week ", filtered_db$week, sep=""),
+                           hovertemplate = paste(
+                             "<b>%{text}</b><br>",
+                             sprintf("%s<br>", filtered_db$map),
+                             sprintf("<br>Game Score: %s<br>", round(filtered_db$gamescore),digits=3),
+                             sprintf("Impact: %s<br>", round(100*filtered_db$impact), digits=3),
+                             sprintf("Survivability: %s<br>", round(100*filtered_db$survive), digits=3),
+                             sprintf("Efficiency: %s<br>", round(100*filtered_db$efficiency), digits=3),
+                             sprintf("Objective: %s<br><br>", round(100*filtered_db$objective), digits=3),
+                             "<i>Click marker for logs.tf</i>"
+                           )
+                           )
 
   fig <- fig %>% add_trace(data = season_avgs, x=~ranking_game, y=~gamescore, mode='lines+markers', name = "Season Average", 
                            line = list(color="rgba(129, 33, 255, 0.5"),marker = list(color="rgba(129, 33, 255, 0.5"))
@@ -130,6 +155,8 @@ time_performance_graph <- function(filtered_db, variable, last_game) {
                                       )
                         )
   fig <- fig %>% add_annotations(x = seq(5,last_game,10), y=5, text=seq(14,27), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  
+  fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db$gamescore, text=paste("<a href='https://logs.tf/",filtered_db$log_id,"'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
   fig <- fig %>% add_text( x = (last_game/2), y=63.75, text = "Top 70% of Game Scores",textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
   fig <- fig %>% add_text( x = (last_game/2), y=82.5, text = "Top 90% of Game Scores", textfont=list(color='rgba(0,0,0,0.3)'), showlegend=FALSE)
@@ -144,6 +171,8 @@ ui <- function(req) {
   fluidPage(
     tags$title('Player Profiles | ozfstats'),
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
+    tags$head(includeHTML("google-analytics.html")),
+    tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback", rel = "stylesheet"),
     tags$script('
         if(self != top) {
         var style = document.createElement("style");
@@ -169,6 +198,10 @@ ui <- function(req) {
                ),
              fluidRow(
                column(12,uiOutput('classSelectFilter'))
+               ),
+             fluidRow(
+               column(12,
+                      htmlOutput('warzoneLink'))
                ),
              hr(),
              fluidRow(
@@ -216,7 +249,7 @@ server <- function(input, output, session) {
   setBookmarkExclude(c(
     '.clientValue-default-plotlyCrosstalkOpts',
     sprintf('.clientValue-%s-pop_hist', plotly_verbose),
-    'plotly_afterplot-A', 'plotly_relayout-A', 'plotly_hover-A', 'shareUrl'
+    'plotly_afterplot-A', 'plotly_relayout-A', 'plotly_hover-A', 'shareUrl', 'plotly_clickannotation-A'
   ))
   
   #bookmark on input change
@@ -232,7 +265,7 @@ server <- function(input, output, session) {
   
   ##Render UI only once database is loaded.
   output$nameSelect <- renderUI({
-    selectizeInput('player', 'Player',choices=names, multiple = F, selected=NULL)
+    selectInput('player', 'Player',choices=names, multiple = F, selected=NULL)
   })
 
   output$classSelectFilter <- renderUI({
@@ -270,6 +303,13 @@ server <- function(input, output, session) {
     output$seasonsPlayed <- renderText({
       seasons <- count_seasons(player_db)
       paste("Seasons Played: ", seasons, " (of ", 14, ")",sep="")
+    })
+    steam_id <- player_names[player_names$nickname == input$player, 'steam_id']
+    warzone_url <- sprintf('http://warzone.ozfortress.com/users/steam_id/%s', convert_steam_id3(steam_id))
+    steam_url <- sprintf('https://steamcommunity.com/profiles/%s', convert_steam_id3(steam_id))
+    
+    output$warzoneLink <- renderText({
+      paste("<a href=",warzone_url," target='_blank'> ozfortress warzone profile </a> <br> <a href=",steam_url," target='_blank'> steam profile </a>",sep="")
     })
 
     output$classGames2 <- renderText({
