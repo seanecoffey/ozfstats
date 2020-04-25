@@ -375,7 +375,7 @@ ui <- function(req) {
              ),
     fluidRow(column(6,
                     br(),
-                    a(href="https://ozfstats.com/loganalyser.html", "Back to ozfstats.com")
+                    a(href="https://ozfstats.com/loganalyser", "Back to ozfstats.com")
     ), class="back-button", id="url-back-button"
     )
   )
@@ -384,7 +384,7 @@ ui <- function(req) {
 #####----------------------------SERVER---------------------------------------
 
 server <- function(input,output,session) {
-  
+
   observeEvent(input$run, {
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
