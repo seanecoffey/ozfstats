@@ -1,4 +1,3 @@
-######### JUNK ABOVE
 #PlayerProfiles
 library(shiny)
 library(plotly)
@@ -6,6 +5,7 @@ library(rlist)
 library(Cairo)
 library(reactable)
 library(dplyr)
+library(shinyFeedback)
 options(shiny.usecairo=T)
 
 ##functions
@@ -189,6 +189,7 @@ time_performance_graph <- function(filtered_db, variable, last_game, updateProgr
 ##UI
 ui <- function(req) {
   fluidPage(
+    useShinyFeedback(),
     tags$title('Player Profiles | ozfstats'),
     tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
     tags$head(includeHTML("google-analytics.html")),
@@ -298,6 +299,8 @@ server <- function(input, output, session) {
 
   #Change outputs when player is selected
   observeEvent(input$player ,{
+    feedback("player", length(input$player) < 40,"This input box is searchable!", color="green")
+    
     output$titleheader <- renderUI({
       text <- paste("Player Profile  |  ", input$player, sep="")
       h2(text)
