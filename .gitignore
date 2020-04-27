@@ -43,3 +43,4 @@ Thumbs.db
 .Rhistory
 ozf_stats_production.Rproj
 scripts/secrets.json
+.rds
