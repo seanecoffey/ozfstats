@@ -45,7 +45,7 @@ map_rename <- function(full_name) {
     return("metalworks")
   }else if(full_name %in% c('cp_prolands_b6','cp_prolands_rc2p','cp_badlands','cp_prolands_b2b','cp_prolands_b4b')) {
     return("prolands")
-  }else if(full_name %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x')) {
+  }else if(full_name %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x', 'cp_logjam_rc12f')) {
     return("logjam")
   }else if(full_name %in% c('cp_sunshine','cp_sunshine_rc8','cp_sunshine_rc9')) {
     return("sunshine")

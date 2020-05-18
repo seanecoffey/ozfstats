@@ -46,7 +46,7 @@ rename_maps <- function(dataframe) {
   dataframe[dataframe$map %in% c('cp_kalinka_rc5'),]$map <- 'kalinka'
   dataframe[dataframe$map %in% c('cp_metalworks'),]$map <- 'metalworks'
   dataframe[dataframe$map %in% c('cp_prolands_b6','cp_prolands_rc2p','cp_badlands','cp_prolands_b2b','cp_prolands_b4b'),]$map <- 'prolands'
-  dataframe[dataframe$map %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x'),]$map <- 'logjam'
+  dataframe[dataframe$map %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x', 'cp_logjam_rc12f'),]$map <- 'logjam'
   dataframe[dataframe$map %in% c('cp_sunshine','cp_sunshine_rc8','cp_sunshine_rc9'),]$map <- 'sunshine'
   dataframe[dataframe$map %in% c('cp_reckoner_rc4a','cp_reckoner_rc5','cp_reckoner_b2a','cp_reckoner_b3a','cp_reckoner_rc1','cp_reckoner_rc2'),]$map <- 'reckoner'
   dataframe[dataframe$map %in% c('koth_bagel_fall_b3'),]$map <- 'bagel'
