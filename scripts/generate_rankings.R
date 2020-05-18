@@ -477,11 +477,13 @@ gen_peaks <- function(current_rankings,last_x_games) {
     peak_rankings <- peak_rankings[,c("nickname", "peak_rank")]
   }
   print("peak rankings generated")
+  
   current_rankings <- merge(current_rankings, peak_rankings, by="nickname", all.x=TRUE)
   current_rankings <- current_rankings %>% dplyr::arrange(-ranking_points)
   setwd()
   setwd("./data")
   write.csv(current_rankings,"current_rankings.csv")
+  write.csv(peak_rankings, "peak_rankings.csv")
   print("Updated current rankings with peaks")
   return(current_rankings)
 }

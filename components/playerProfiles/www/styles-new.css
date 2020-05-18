@@ -1,0 +1,46 @@
+.class-image {
+  max-width: 150px;
+  width:100%;
+}
+
+.sidePanel {
+  text-align:center;
+  /*border:2px solid rgb(28, 30, 34);
+  border-radius: 5px*/
+}
+
+.mainTitle {
+  min-width: 322px;
+}
+
+.statsColumn {
+ text-align:right;
+ padding:2px;
+}
+
+.answerColumn {
+  text-align:left;
+  padding:2px;
+}
+
+.mainPanel {
+  padding-left: 30px; 
+  /*border:2px solid rgb(28, 30, 34);
+  border-radius: 5px*/
+}
+
+.statistic-top {
+  margin: auto!important;
+  margin-top: 0px!important;
+  margin-bottom: 3em!important;
+}
+
+.statistic-bottom {
+  margin: auto!important;
+  margin-top: 0px!important;
+}
+
+.statistic-even {
+  margin: auto!important;
+  width: 130px!important;
+}
