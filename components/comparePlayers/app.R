@@ -5,7 +5,6 @@ library(rlist)
 library(Cairo)
 library(reactable)
 options(shiny.usecairo=T)
-library(shinythemes)
 
 ##Read sum stats for comparison.
 summed_dr <- read.csv('../../data/summarised_stats.csv')
@@ -21,7 +20,6 @@ round_df <- function(df, digits) {
 }
 
 ui <- fluidPage(
-  shinythemes::themeSelector(),
   tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback",
             rel = "stylesheet"),
   tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
