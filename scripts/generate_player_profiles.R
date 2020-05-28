@@ -113,7 +113,8 @@ run_detailed_analysis <- function(division) {
 
 detailed_results_prem <- run_detailed_analysis("prem")
 detailed_results_inter <- run_detailed_analysis("inter")
-detailed_results <- rbind(detailed_results_prem, detailed_results_inter)
+detailed_results_high <- run_detailed_analysis("high")
+detailed_results <- rbind(detailed_results_prem, detailed_results_inter, detailed_results_high)
 setwd()
 setwd("./data")
 write.csv(detailed_results, 'detailed_stats.csv')

@@ -413,12 +413,19 @@ generate_rankings <- function(dataframe, current_game, string) {
   current_rankings$rank <- NA
   current_rankings$rank[order(-current_rankings$ranking_points)] <- 1:nrow(current_rankings)
 
-  previous_games$prev_ranking_points <- reduce_rating_vec(previous_games$prev_ranking_points, previous_games$prev_games)
-  previous_games$prev_rank <- NA
-  previous_games$prev_rank[order(-previous_games$prev_ranking_points)] <- 1:nrow(previous_games)
-
+  if(nrow(previous_games) > 0) {
+    previous_games$prev_ranking_points <- reduce_rating_vec(previous_games$prev_ranking_points, previous_games$prev_games)
+    previous_games$prev_rank <- NA
+    previous_games$prev_rank[order(-previous_games$prev_ranking_points)] <- 1:nrow(previous_games)
+  }
+  
   current_rankings <- merge(current_rankings, previous_games, by="nickname", all=TRUE)
-  current_rankings$rank_change <- current_rankings$prev_rank - current_rankings$rank
+  if (nrow(previous_games) > 0) {
+    current_rankings$rank_change <- current_rankings$prev_rank - current_rankings$rank
+  } else {
+    current_rankings$rank_change <- NA
+    current_rankings$prev_rank <- NA
+  }
   current_rankings <- current_rankings %>% dplyr::arrange(-ranking_points) %>% filter(rank > 0)
 
   setwd()
@@ -437,17 +444,21 @@ generate_dists(player.data)
 ##ANALYSE PERFORMANCE
 all_games <- run_analysis("prem")
 all_games_inter <- run_analysis("inter")
+all_games_high <- run_analysis("high")
 ##GENERATE RANKINGS
 season_rankings <- generate_full_season_ranks(all_games, "season_ranks.csv")
 season_rankings_inter <- generate_full_season_ranks(all_games_inter, "season_ranks_inter.csv")
+season_rankings_high <- generate_full_season_ranks(all_games_high, "season_ranks_high.csv")
 season_rankings$div <- "prem"
 season_rankings_inter$div <- "inter"
-season_rankings_combined <- rbind(season_rankings, season_rankings_inter)
+season_rankings_high$div <- "high"
+season_rankings_combined <- rbind(season_rankings, season_rankings_inter, season_rankings_high)
 season_rankings_combined <- season_rankings_combined %>% arrange(-gamescore)
 write.csv(season_rankings_combined, "season_rankings_combined.csv")
 
 current_rankings <- generate_rankings(all_games, last_game, "current_rankings.csv")
 current_rankings_inter <- generate_rankings(all_games_inter, last_game, "current_rankings_inter.csv")
+current_rankings_high <- generate_rankings(all_games_high, last_game, "current_rankings_high.csv")
 
 get_peak <- function(peak_rank, new_rank) {
   if(is.na(peak_rank)) {
@@ -506,15 +517,43 @@ gen_peaks_inter <- function(current_rankings,last_x_games) {
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
     peak_rankings <- peak_rankings[,c("nickname", "peak_rank")]
   }
-  print("peak rankings generated")
+  print("inter peak rankings generated")
   current_rankings <- merge(current_rankings, peak_rankings, by="nickname", all.x=TRUE)
   current_rankings <- current_rankings %>% dplyr::arrange(-ranking_points)
   setwd()
   setwd("./data")
   write.csv(current_rankings,"current_rankings_inter.csv")
-  print("Updated current rankings with peaks")
+  print("Updated current inter rankings with peaks")
   return(current_rankings)
 }
 
 ##Do it for the end of season 25 onward.
 current_rankings_inter <- gen_peaks_inter(current_rankings_inter, last_game-10)
+
+##
+##PEAK HIGH RANKINGS
+gen_peaks_high <- function(current_rankings,last_x_games) {
+  print("generating peaks high")
+  peak_rankings <- current_rankings %>% dplyr::group_by(nickname) %>% dplyr::select(nickname, rank)
+  peak_rankings$peak_rank <- peak_rankings$rank
+  peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
+  
+  for(i in 1:last_x_games) {
+    this_ranking <- generate_rankings(all_games, last_game - i, NULL)
+    this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
+    peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
+    peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
+    peak_rankings <- peak_rankings[,c("nickname", "peak_rank")]
+  }
+  print("high peak rankings generated")
+  current_rankings <- merge(current_rankings, peak_rankings, by="nickname", all.x=TRUE)
+  current_rankings <- current_rankings %>% dplyr::arrange(-ranking_points)
+  setwd()
+  setwd("./data")
+  write.csv(current_rankings,"current_rankings_high.csv")
+  print("Updated current high rankings with peaks")
+  return(current_rankings)
+}
+
+##Do it for the end of season 25 onward.
+current_rankings_high <- gen_peaks_high(current_rankings_high, last_game-10)

@@ -51,7 +51,7 @@ ui <- fluidPage(
                 sidebarPanel(id='sidebar-div',
                              fluidRow(
                                column(2,selectInput("seasonInput","Season",
-                                                    choices = c("All","Last5",27:14),selected = 27)),
+                                                    choices = c("All","Last5",28:14),selected = 28)),
                                column(5,selectInput("ystat","Y Statistic",
                                                     choices = c("Damage per Minute"="damage_per_minute",
                                                                 "KA/D"="ka_d",
@@ -148,12 +148,12 @@ server <- function(input,output,session) {
           filtered$name<-paste(filtered$name," (S",filtered$season,")",sep="")
         }
         p<-ggplot(filtered, aes(x=reorder(name,get(input$xstat)), y=get(input$xstat), fill=factor(filtered$season))) + geom_bar(stat="identity") + coord_flip() +
-          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons 14-27",sep=" ")), y=toString(labels[which(labels$lookup==input$xstat),]$string), x="", fill="Season")
+          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons 14-28",sep=" ")), y=toString(labels[which(labels$lookup==input$xstat),]$string), x="", fill="Season")
         ggplotly(p)%>% config(displaylogo = FALSE)
       } else {
         p<-ggplot(filtered, aes(x=get(input$xstat), y=get(input$ystat)
                                 , label=name)) + geom_point(aes(colour=factor(filtered$season))) + stat_smooth(method="glm", size=1) + geom_text(check_overlap=TRUE) +
-          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons 14-27",sep=" ")), x=toString(labels[which(labels$lookup==input$xstat),]$string), y=toString(labels[which(labels$lookup==input$ystat),]$string), colour="season") + theme_minimal()
+          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons 14-28",sep=" ")), x=toString(labels[which(labels$lookup==input$xstat),]$string), y=toString(labels[which(labels$lookup==input$ystat),]$string), colour="season") + theme_minimal()
         ggplotly(p, tooltip="label")%>% config(displaylogo = FALSE)
       }
     } else if (input$seasonInput=="Last5") {
@@ -166,12 +166,12 @@ server <- function(input,output,session) {
           filtered$name<-paste(filtered$name," (S",filtered$season,")",sep="")
         }
         p<-ggplot(filtered, aes(x=reorder(name,get(input$xstat)), y=get(input$xstat), fill=factor(filtered$season))) + geom_bar(stat="identity") + coord_flip() +
-          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons",currentseason-5,"-",currentseason,sep=" ")), y=toString(labels[which(labels$lookup==input$xstat),]$string), x="", fill="Season")
+          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons",currentseason-4,"-",currentseason,sep=" ")), y=toString(labels[which(labels$lookup==input$xstat),]$string), x="", fill="Season")
         ggplotly(p)%>% config(displaylogo = FALSE)
       } else {
         p<-ggplot(filtered, aes(x=get(input$xstat), y=get(input$ystat)
                                 , label=name)) + geom_point(aes(colour=factor(filtered$season))) + stat_smooth(method="glm", size=1) + geom_text(check_overlap=TRUE) +
-          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons",currentseason-5,"-",currentseason,sep=" ")), x=toString(labels[which(labels$lookup==input$xstat),]$string), y=toString(labels[which(labels$lookup==input$ystat),]$string), colour="season") + theme_minimal()
+          labs(title=toupper(paste("ozfortress premier",input$classInput,"seasons",currentseason-4,"-",currentseason,sep=" ")), x=toString(labels[which(labels$lookup==input$xstat),]$string), y=toString(labels[which(labels$lookup==input$ystat),]$string), colour="season") + theme_minimal()
         ggplotly(p, tooltip="label")%>% config(displaylogo = FALSE)
       }
     } else {
@@ -201,7 +201,7 @@ server <- function(input,output,session) {
     updateSelectInput(session, "xstat", selected=input$ystat)
   })
   observeEvent(input$resetbutton, {
-    updateSelectInput(session, "seasonInput", selected=27)
+    updateSelectInput(session, "seasonInput", selected=28)
     updateSelectInput(session, "ystat", selected="heals_per_minute")
     updateSelectInput(session, "xstat", selected="damage_per_minute")
     updateSelectInput(session, "classInput", selected="Demoman")

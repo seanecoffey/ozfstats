@@ -101,61 +101,123 @@ gen_season_table <- function(data, updateProgress = NULL) {
     text <- "Generating ranking table"
     updateProgress(detail = text)
   }
-
-  season_table <- reactable(
-    data,
-    showPageSizeOptions=TRUE,
-    pageSizeOptions= c(20, 50, 100, 500, 1000),
-    defaultPageSize=100,
-    highlight=TRUE,
-    defaultSorted="rank",
-    defaultSortOrder="asc",
-    defaultColGroup = colGroup(headerClass = "header"),
-    defaultColDef = colDef(headerClass = "header col-header"),
-    columnGroups = list(
-      colGroup(name = "Scores", columns = score_cols)
-    ),
-    columns = list(
-      rank = ranking_column(name = "Ranking",
-                         headerStyle = list(fontWeight=700),
-                         cell = function(value, index) {
-                           div(
-                             class = "ranking",
-                             div(class = "ranking-val", value)
-                           )
-                         }
+  
+  if(nrow(data) == 0) {
+    season_table <- reactable(
+      data,
+      showPageSizeOptions=TRUE,
+      pageSizeOptions= c(20, 50, 100, 500, 1000),
+      defaultPageSize=100,
+      highlight=TRUE,
+      defaultSorted="rank",
+      defaultSortOrder="asc",
+      defaultColGroup = colGroup(headerClass = "header"),
+      defaultColDef = colDef(headerClass = "header col-header"),
+      columnGroups = list(
+        colGroup(name = "Scores", columns = score_cols)
       ),
-      nickname = colDef(name = "Player Name",
-                        headerStyle = list(fontWeight = 700),
-                        minWidth = 200,
-                        cell = function(value, index) {
-                        profile_url <- sprintf('https://app.ozfstats.com/playerProfiles/?_inputs_&classFilter="All"&player="%s"',value)
-                          div(
-                            class = "name",
-                            div(class = "player-name", htmltools::tags$a(href = profile_url, target = "_blank", value)),
-                            div(class = "class", sprintf("%s", data[index,"classes"]))
-                          )
-                        }
+      columns = list(
+        rank = ranking_column(name = "Ranking",
+                              headerStyle = list(fontWeight=700)
+        ),
+        nickname = colDef(name = "Player Name",
+                          headerStyle = list(fontWeight = 700),
+                          minWidth = 200,
+                          class = "name",
+                          cell = function(value, index) {
+                            profile_url <- sprintf('https://app.ozfstats.com/playerProfiles/?_inputs_&classFilter="All"&player="%s"',value)
+                            div(
+                              class = "name",
+                              div(class = "player-name", htmltools::tags$a(href = profile_url, target = "_blank", value)),
+                              div(class = "class", sprintf("%s", data[index,"classes"]))
+                            )
+                          }
+        ),
+        classes = colDef(show = FALSE),
+        season = ranking_column (name = "Season"),
+        div = ranking_column (name="Division"),
+        gamescore = ranking_column(header = (span("Season Score")), format = colFormat(digits = 1)
+        ),
+        n = ranking_column(name = "Maps Played (Season)"),
+        impact = colDef(
+          header = (span("Impact", title = "Considers DPM, KA/D, K/D, KPM, HPM, CHARGES")),
+          maxWidth=100,
+          class = paste("number")
+        ),
+        survive = colDef(
+          header = (span("Survivability", title = "Considers DT/M, DEATHS/M, DROPS/M")),
+          maxWidth=100,
+          class = paste("number")
+        ),
+        efficiency = colDef(
+          header = (span("Efficiency", title = "Considers D/DT, D/HR, DROPS/UBER, K/HR")),
+          maxWidth=100,
+          class = paste("number")
+        ),
+        objective = colDef(
+          header = (span("Objective", title = "Considers WIN-LOSS, GAME MARGIN, CAPS")),
+          maxWidth = 100,
+          class = paste("number")
+        )
       ),
-      classes = colDef(show = FALSE),
-      season = ranking_column (name = "Season"),
-      div = ranking_column (name="Division"),
-      gamescore = ranking_column(header = (span("Season Score")), format = colFormat(digits = 1),
-                                 cell = function(value) {
-                                   scaled <- (value - min(season_ranks$gamescore)) / (max(season_ranks$gamescore) - min(season_ranks$gamescore))
-                                   color <- ranking_color(scaled)
-                                   value <- format(round(value,1), nsmall=1)
-                                   div(class = "spi-rating", style = list(background = color), value)
-                                 }
+      class = "standings-table"
+    )
+  } else {
+    season_table <- reactable(
+      data,
+      showPageSizeOptions=TRUE,
+      pageSizeOptions= c(20, 50, 100, 500, 1000),
+      defaultPageSize=100,
+      highlight=TRUE,
+      defaultSorted="rank",
+      defaultSortOrder="asc",
+      defaultColGroup = colGroup(headerClass = "header"),
+      defaultColDef = colDef(headerClass = "header col-header"),
+      columnGroups = list(
+        colGroup(name = "Scores", columns = score_cols)
       ),
-      n = ranking_column(name = "Maps Played (Season)"),
-      impact = score_column(header = (span("Impact", title = "Considers DPM, KA/D, K/D, KPM, HPM, CHARGES")), minp = min_p2, maxp = max_p2),
-      survive = score_column(header = (span("Survivability", title = "Considers DT/M, DEATHS/M, DROPS/M")), minp = min_p2, maxp = max_p2),
-      efficiency = score_column(header = (span("Efficiency", title = "Considers D/DT, D/HR, DROPS/UBER, K/HR")), minp = min_p2, maxp = max_p2),
-      objective = score_column(header = (span("Objective", title = "Considers WIN-LOSS, GAME MARGIN, CAPS")), minp = min_p2, maxp = max_p2)
-    ),
-    class = "standings-table"
-  )
+      columns = list(
+        rank = ranking_column(name = "Ranking",
+                           headerStyle = list(fontWeight=700),
+                           cell = function(value, index) {
+                             div(
+                               class = "ranking",
+                               div(class = "ranking-val", value)
+                             )
+                           }
+        ),
+        nickname = colDef(name = "Player Name",
+                          headerStyle = list(fontWeight = 700),
+                          minWidth = 200,
+                          cell = function(value, index) {
+                          profile_url <- sprintf('https://app.ozfstats.com/playerProfiles/?_inputs_&classFilter="All"&player="%s"',value)
+                            div(
+                              class = "name",
+                              div(class = "player-name", htmltools::tags$a(href = profile_url, target = "_blank", value)),
+                              div(class = "class", sprintf("%s", data[index,"classes"]))
+                            )
+                          }
+        ),
+        classes = colDef(show = FALSE),
+        season = ranking_column (name = "Season"),
+        div = ranking_column (name="Division"),
+        gamescore = ranking_column(header = (span("Season Score")), format = colFormat(digits = 1),
+                                   cell = function(value) {
+                                     scaled <- (value - min(season_ranks$gamescore)) / (max(season_ranks$gamescore) - min(season_ranks$gamescore))
+                                     color <- ranking_color(scaled)
+                                     value <- format(round(value,1), nsmall=1)
+                                     div(class = "spi-rating", style = list(background = color), value)
+                                   }
+        ),
+        n = ranking_column(name = "Maps Played (Season)"),
+        impact = score_column(header = (span("Impact", title = "Considers DPM, KA/D, K/D, KPM, HPM, CHARGES")), minp = min_p2, maxp = max_p2),
+        survive = score_column(header = (span("Survivability", title = "Considers DT/M, DEATHS/M, DROPS/M")), minp = min_p2, maxp = max_p2),
+        efficiency = score_column(header = (span("Efficiency", title = "Considers D/DT, D/HR, DROPS/UBER, K/HR")), minp = min_p2, maxp = max_p2),
+        objective = score_column(header = (span("Objective", title = "Considers WIN-LOSS, GAME MARGIN, CAPS")), minp = min_p2, maxp = max_p2)
+      ),
+      class = "standings-table"
+    )
+  }
   if(is.function(updateProgress)) {
     text <- "Rendering table..."
     updateProgress(detail = text)
@@ -186,7 +248,7 @@ ui <- fluidPage(
               )
               ),
               fluidRow(
-                column(width=2,selectizeInput("rankseasonfilter", label = "Season", choices = c(14:27),multiple=TRUE, width="100%")),
+                column(width=2,selectizeInput("rankseasonfilter", label = "Season", choices = c(14:28),multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankplayerfilter", label = "Player", choices = player_names ,multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankclassfilter", label = "Class", choices = c("scout", "soldier", "demoman", "medic"),multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankdivfilter", label="Division", choices = unique(season_ranks$div),multiple=TRUE, width="100%")),
@@ -226,12 +288,18 @@ server <- function(input,output,session) {
     if(!is.null(input$rankdivfilter)) {
       season_data <- season_data %>% filter(season_data$div %in% input$rankdivfilter)
     }
-    season_data$rank <- NA
-    season_data$rank[order(-season_data$gamescore)] <- 1:nrow(season_data)
     columns = c("rank", "nickname", "classes", "season","div","gamescore", "impact", "survive", "efficiency", "objective", "n")
-    season_data <- season_data[, columns]
-
-    gen_season_table(season_data, updateProgress)
+    if(nrow(season_data)==0) {
+      season_data <- data.frame(matrix(0, nrow=0, ncol=length(columns)))
+      colnames(season_data) <- columns
+      gen_season_table(season_data, updateProgress)
+    } else {
+      season_data$rank <- NA
+      season_data$rank[order(-season_data$gamescore)] <- 1:nrow(season_data)
+      season_data <- season_data[, columns]
+  
+      gen_season_table(season_data, updateProgress)
+    }
   })
 }
 

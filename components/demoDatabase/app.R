@@ -9,7 +9,7 @@ colnames(demos) <- c('player', 'role', 'map', 'link', 'comments')
 
 demo_table <- function() {
   t <- reactable(demos, columns = list(
-  player = colDef(name = "Player", 
+  player = colDef(name = "Player",
                   cell = function(value, index) {
                     url <- demos[index, 'link']
                     div(
@@ -44,7 +44,7 @@ demo_table <- function() {
   striped = TRUE,
   bordered = TRUE
   )
-  
+
   return(t)
 }
 
@@ -53,7 +53,7 @@ ui <- fluidPage (
   tags$title("OZF POV Demo Database"),
   tags$link(href = "https://fonts.googleapis.com/css?family=Karla:400,700|Fira+Mono&display=fallback", rel = "stylesheet"),
   tags$link(rel = "stylesheet", type = "text/css", href = "styles.css?rnd132"),
-  
+
   column(12,
          fluidRow(
            column(12,
@@ -69,7 +69,7 @@ ui <- fluidPage (
                       ),
                       h4("Some other notes about these demos:"),
                       tags$ol(
-                        tags$li("You can only learn so much from watching someone else's POV - you do not have team comms or the thougths of the player."),
+                        tags$li("You can only learn so much from watching someone else's POV - you do not have team comms or the thoughts of the player."),
                         tags$li("Every team composition is different, and the role each player is playing within the team might not be the same."),
                         tags$li("To make the most of these demos, think critically and ask yourself why the player is doing the things they are doing."),
                         tags$li("Constantly think about the uber situation while watching these demos, and how the players change their behaviour during different situations."),

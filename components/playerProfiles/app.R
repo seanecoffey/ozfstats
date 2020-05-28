@@ -73,7 +73,7 @@ player_filter <- function(db, player, class = NULL, division = NULL) {
 
   if(!is.null(division)) {
     if (division == 'All') {
-      division <- c('prem', 'inter')
+      division <- c('prem', 'high', 'inter')
     }
     filtered <- filtered %>% filter(div %in% division)
   }
@@ -297,18 +297,18 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
   fig <- fig %>% add_trace(data = season_avgs, x=~ranking_game, y=~gamescore, mode='lines+markers', name = "Season Average",
                            line = list(color="rgba(129, 33, 255, 0.5"),marker = list(color="rgba(129, 33, 255, 0.5"))
 
-  fig <- fig %>% layout(xaxis=list(range = c(0,last_game), showticklabels=FALSE, title="Season"), yaxis=list(range=c(0,95), title=variable),
+  fig <- fig %>% layout(xaxis=list(range = c(0,last_game+5), showticklabels=FALSE, title="Season"), yaxis=list(range=c(0,95), title=variable),
                         shapes = list(
                           list(type = "rect", layer="below",fillcolor = '#edec9e', line = list(color="#edec9e"), opacity=0.2,
-                               x0=0, x1=last_game,xref="x", y0=42.5, y1=57.5, yref="y"),
+                               x0=0, x1=last_game+5,xref="x", y0=42.5, y1=57.5, yref="y"),
                           list(type = "rect", layer="below",fillcolor = '#f4a770', line = list(color="#f4a770"), opacity=0.2,
-                               x0=0, x1=last_game,xref="x", y0=30, y1=42.5, yref="y"),
+                               x0=0, x1=last_game+5,xref="x", y0=30, y1=42.5, yref="y"),
                           list(type = "rect", layer="below",fillcolor = '#c0d292', line = list(color="#c0d292"), opacity=0.2,
-                               x0=0, x1=last_game,xref="x", y0=57.5, y1=70, yref="y"),
+                               x0=0, x1=last_game+5,xref="x", y0=57.5, y1=70, yref="y"),
                           list(type = "rect", layer="below",fillcolor = '#f14d4d', line = list(color="#f14d4d"), opacity=0.2,
-                               x0=0, x1=last_game,xref="x", y0=0, y1=30, yref="y"),
+                               x0=0, x1=last_game+5,xref="x", y0=0, y1=30, yref="y"),
                           list(type = "rect", layer="below",fillcolor = '#35b0ab', line = list(color="#35b0ab"), opacity=0.2,
-                               x0=0, x1=last_game,xref="x", y0=70, y1=100, yref="y", name="Elite")
+                               x0=0, x1=last_game+5,xref="x", y0=70, y1=100, yref="y", name="Elite")
                         )
   )
   if(is.function(updateProgress)) {
@@ -316,7 +316,7 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
     updateProgress(detail = text)
     Sys.sleep(0.1)
   }
-  fig <- fig %>% add_annotations(x = seq(5,last_game,10), y=5, text=seq(14,27), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=5, text=seq(14,28), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
 
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db$gamescore, text=paste("<a href='https://logs.tf/",filtered_db$log_id,'#', steam_id, "'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
@@ -370,13 +370,25 @@ variable_performance_graph <- function(filtered_db, variable, last_game, player,
                            )
   )
 
-  fig <- fig %>% layout(xaxis=list(range = c(0,last_game), showticklabels=FALSE, title="Season"), yaxis=list(title=variable))
+  fig <- fig %>% layout(xaxis=list(range = c(0,last_game+5), showticklabels=FALSE, title="Season"), yaxis=list(title=variable))
   if(is.function(updateProgress)) {
     text <- "Partitioning Social Network"
     updateProgress(detail = text)
     Sys.sleep(0.1)
   }
-  fig <- fig %>% add_annotations(x = seq(5,last_game,10), y=0.1, text=seq(14,27), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  if(is.numeric(filtered_db[[variable]])) {
+    min_y = min(filtered_db[[variable]])
+    if (min_y < 1) {
+      annot_y <- 0.1
+    } else if(min_y < 10) {
+      annot_y <- 1
+    } else {
+      annot_y <- 5
+    }
+  } else {
+    annot_y <- 0
+  }
+  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=annot_y, text=seq(14,28), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
 
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db[[variable]], text=paste("<a href='https://logs.tf/",filtered_db$log_id,'#', steam_id, "'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
@@ -621,6 +633,7 @@ server <- function(input, output, session) {
     selectInput('divisionFilter', 'Division', choices = c(
       'All',
       'Premier' = 'prem',
+      'High' = 'high',
       'Intermediate' = 'inter'
     ))
   })
