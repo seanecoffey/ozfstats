@@ -231,6 +231,10 @@ ui <- fluidPage(
                                          fluidRow(
                                            div(class = "title",
                                                p("Current weighted player rankings using a 2 season rolling window. Click player name for link to player statistics profile."),
+                                               p("Note: 'Peak' rankings for High Division may not reflect the previous weeks' rankings, this is due to the back-calculated nature of the peak rankings and the small dataset for High divison, this will become more stable over the season.
+                                                 An example of this is that when more information comes in about how sunshine is played over week 2, the results of week 1 may be slightly adjusted, which retrospectively means that a player at rank 5 in week 1 may only historically be 
+                                                 rank 6 for that same week upon reflection of the actual division-wide performance on sunshine.
+                                                 "),
                                                p("See the about section for details on how the rankings are calculated.")
                                                )
                                            )
