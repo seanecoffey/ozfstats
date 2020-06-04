@@ -410,8 +410,11 @@ generate_rankings <- function(dataframe, current_game, string) {
     objective = mean(objective),
   )
   current_rankings$ranking_points <- reduce_rating_vec(current_rankings$ranking_points, current_rankings$n)
-  current_rankings$rank <- NA
-  current_rankings$rank[order(-current_rankings$ranking_points)] <- 1:nrow(current_rankings)
+  if(nrow(current_rankings) > 0) {
+    current_rankings$rank <- NA
+    current_rankings$rank[order(-current_rankings$ranking_points)] <- 1:nrow(current_rankings)
+  }
+  
 
   if(nrow(previous_games) > 0) {
     previous_games$prev_ranking_points <- reduce_rating_vec(previous_games$prev_ranking_points, previous_games$prev_games)
@@ -422,6 +425,8 @@ generate_rankings <- function(dataframe, current_game, string) {
   current_rankings <- merge(current_rankings, previous_games, by="nickname", all=TRUE)
   if (nrow(previous_games) > 0) {
     current_rankings$rank_change <- current_rankings$prev_rank - current_rankings$rank
+  } else if (is.null(string)) {
+    #Do nothing when checking for peak rankings.
   } else {
     current_rankings$rank_change <- NA
     current_rankings$prev_rank <- NA
@@ -511,7 +516,7 @@ gen_peaks_inter <- function(current_rankings,last_x_games) {
   peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
 
   for(i in 1:last_x_games) {
-    this_ranking <- generate_rankings(all_games, last_game - i, NULL)
+    this_ranking <- generate_rankings(all_games_inter, last_game - i, NULL)
     this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
     peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
@@ -528,7 +533,7 @@ gen_peaks_inter <- function(current_rankings,last_x_games) {
 }
 
 ##Do it for the end of season 25 onward.
-current_rankings_inter <- gen_peaks_inter(current_rankings_inter, last_game-10)
+current_rankings_inter <- gen_peaks_inter(current_rankings_inter, last_game-101)
 
 ##
 ##PEAK HIGH RANKINGS
@@ -539,13 +544,14 @@ gen_peaks_high <- function(current_rankings,last_x_games) {
   peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
   
   for(i in 1:last_x_games) {
-    this_ranking <- generate_rankings(all_games, last_game - i, NULL)
+    this_ranking <- generate_rankings(all_games_high, last_game - i, NULL)
     this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
     peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
     peak_rankings <- peak_rankings[,c("nickname", "peak_rank")]
   }
   print("high peak rankings generated")
+  
   current_rankings <- merge(current_rankings, peak_rankings, by="nickname", all.x=TRUE)
   current_rankings <- current_rankings %>% dplyr::arrange(-ranking_points)
   setwd()
@@ -556,4 +562,4 @@ gen_peaks_high <- function(current_rankings,last_x_games) {
 }
 
 ##Do it for the end of season 25 onward.
-current_rankings_high <- gen_peaks_high(current_rankings_high, last_game-10)
+current_rankings_high <- gen_peaks_high(current_rankings_high, 1)
