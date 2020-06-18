@@ -297,7 +297,7 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
   fig <- fig %>% add_trace(data = season_avgs, x=~ranking_game, y=~gamescore, mode='lines+markers', name = "Season Average",
                            line = list(color="rgba(129, 33, 255, 0.5"),marker = list(color="rgba(129, 33, 255, 0.5"))
 
-  fig <- fig %>% layout(xaxis=list(range = c(0,last_game+5), showticklabels=FALSE, title="Season"), yaxis=list(range=c(0,95), title=variable),
+  fig <- fig %>% layout(xaxis=list(range = c(0,last_game+5), showticklabels=FALSE, title="Season"), yaxis=list(range=c(0,99), title=variable),
                         shapes = list(
                           list(type = "rect", layer="below",fillcolor = '#edec9e', line = list(color="#edec9e"), opacity=0.2,
                                x0=0, x1=last_game+5,xref="x", y0=42.5, y1=57.5, yref="y"),

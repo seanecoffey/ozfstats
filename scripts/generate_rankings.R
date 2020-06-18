@@ -46,7 +46,7 @@ rename_maps <- function(dataframe) {
   dataframe[dataframe$map %in% c('cp_kalinka_rc5'),]$map <- 'kalinka'
   dataframe[dataframe$map %in% c('cp_metalworks'),]$map <- 'metalworks'
   dataframe[dataframe$map %in% c('cp_prolands_b6','cp_prolands_rc2p','cp_badlands','cp_prolands_b2b','cp_prolands_b4b'),]$map <- 'prolands'
-  dataframe[dataframe$map %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x', 'cp_logjam_rc12f'),]$map <- 'logjam'
+  dataframe[dataframe$map %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x', 'cp_logjam_rc12f','cp_logjam_rc12'),]$map <- 'logjam'
   dataframe[dataframe$map %in% c('cp_sunshine','cp_sunshine_rc8','cp_sunshine_rc9'),]$map <- 'sunshine'
   dataframe[dataframe$map %in% c('cp_reckoner_rc4a','cp_reckoner_rc5','cp_reckoner_b2a','cp_reckoner_b3a','cp_reckoner_rc1','cp_reckoner_rc2'),]$map <- 'reckoner'
   dataframe[dataframe$map %in% c('koth_bagel_fall_b3'),]$map <- 'bagel'
@@ -137,6 +137,8 @@ fix_negative <- function(combat, vars) {
   }
   return(combat)
 }
+
+
 
 cap_one <- function(data, vars) {
   for(var in vars) {
@@ -562,4 +564,4 @@ gen_peaks_high <- function(current_rankings,last_x_games) {
 }
 
 ##Do it for the end of season 25 onward.
-current_rankings_high <- gen_peaks_high(current_rankings_high, 1)
+current_rankings_high <- gen_peaks_high(current_rankings_high, last_game - 141)
