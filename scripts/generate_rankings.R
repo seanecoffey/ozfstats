@@ -48,8 +48,9 @@ rename_maps <- function(dataframe) {
   dataframe[dataframe$map %in% c('cp_prolands_b6','cp_prolands_rc2p','cp_badlands','cp_prolands_b2b','cp_prolands_b4b'),]$map <- 'prolands'
   dataframe[dataframe$map %in% c('cp_logjam_rc10a','cp_logjam_rc5','cp_logjam_rc11','cp_logjam_rc11x', 'cp_logjam_rc12f','cp_logjam_rc12'),]$map <- 'logjam'
   dataframe[dataframe$map %in% c('cp_sunshine','cp_sunshine_rc8','cp_sunshine_rc9'),]$map <- 'sunshine'
-  dataframe[dataframe$map %in% c('cp_reckoner_rc4a','cp_reckoner_rc5','cp_reckoner_b2a','cp_reckoner_b3a','cp_reckoner_rc1','cp_reckoner_rc2'),]$map <- 'reckoner'
+  dataframe[dataframe$map %in% c('cp_reckoner_rc6','cp_reckoner_rc4a','cp_reckoner_rc5','cp_reckoner_b2a','cp_reckoner_b3a','cp_reckoner_rc1','cp_reckoner_rc2'),]$map <- 'reckoner'
   dataframe[dataframe$map %in% c('koth_bagel_fall_b3'),]$map <- 'bagel'
+  tryCatch({ dataframe[dataframe$map %in% c('cp_villa_b16a'),]$map <- 'villa'}, error = function(err) {print(err)}, finally = {})
   return(dataframe)
 }
 
@@ -377,7 +378,21 @@ reduce_rating <- function(ranking, n) {
 
 reduce_rating_vec <- Vectorize(reduce_rating, vectorize.args=c("ranking","n"))
 
-generate_rankings <- function(dataframe, current_game, string) {
+reduce_rating_non_prem <- function(ranking, n) {
+  if (is.na(n)) {
+    return(NA)
+  }
+  else if (n>=10) {
+    return (ranking)
+  } else {
+    red <- rating_reduction(10 - n)
+    return (ranking * red)
+  }
+}
+
+reduce_rating_non_prem_vec <- Vectorize(reduce_rating_non_prem, vectorize.args=c("ranking","n"))
+
+generate_rankings <- function(dataframe, current_game, string, division) {
   dataframe$ranking_game <- 0
   dataframe$ranking_weight <- 0
   dataframe$prev_ranking_weight <- 0
@@ -411,15 +426,21 @@ generate_rankings <- function(dataframe, current_game, string) {
     efficiency = mean(efficiency),
     objective = mean(objective),
   )
-  current_rankings$ranking_points <- reduce_rating_vec(current_rankings$ranking_points, current_rankings$n)
+  if(division == "prem") {
+    current_rankings$ranking_points <- reduce_rating_vec(current_rankings$ranking_points, current_rankings$n)
+  } else {
+    current_rankings$ranking_points <- reduce_rating_non_prem_vec(current_rankings$ranking_points, current_rankings$n)
+  }
   if(nrow(current_rankings) > 0) {
     current_rankings$rank <- NA
     current_rankings$rank[order(-current_rankings$ranking_points)] <- 1:nrow(current_rankings)
   }
-  
-
   if(nrow(previous_games) > 0) {
-    previous_games$prev_ranking_points <- reduce_rating_vec(previous_games$prev_ranking_points, previous_games$prev_games)
+    if(division == "prem") {
+      previous_games$prev_ranking_points <- reduce_rating_vec(previous_games$prev_ranking_points, previous_games$prev_games)
+    } else {
+      previous_games$prev_ranking_points <- reduce_rating_non_prem_vec(previous_games$prev_ranking_points, previous_games$prev_games)
+    }
     previous_games$prev_rank <- NA
     previous_games$prev_rank[order(-previous_games$prev_ranking_points)] <- 1:nrow(previous_games)
   }
@@ -463,9 +484,9 @@ season_rankings_combined <- rbind(season_rankings, season_rankings_inter, season
 season_rankings_combined <- season_rankings_combined %>% arrange(-gamescore)
 write.csv(season_rankings_combined, "season_rankings_combined.csv")
 
-current_rankings <- generate_rankings(all_games, last_game, "current_rankings.csv")
-current_rankings_inter <- generate_rankings(all_games_inter, last_game, "current_rankings_inter.csv")
-current_rankings_high <- generate_rankings(all_games_high, last_game, "current_rankings_high.csv")
+current_rankings <- generate_rankings(all_games, last_game, "current_rankings.csv", "prem")
+current_rankings_inter <- generate_rankings(all_games_inter, last_game, "current_rankings_inter.csv", "inter")
+current_rankings_high <- generate_rankings(all_games_high, last_game, "current_rankings_high.csv", "high")
 
 get_peak <- function(peak_rank, new_rank) {
   if(is.na(peak_rank)) {
@@ -488,7 +509,7 @@ gen_peaks <- function(current_rankings,last_x_games) {
   peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
 
   for(i in 1:last_x_games) {
-    this_ranking <- generate_rankings(all_games, last_game - i, NULL)
+    this_ranking <- generate_rankings(all_games, last_game - i, NULL, "prem")
     this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
     peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
@@ -518,7 +539,7 @@ gen_peaks_inter <- function(current_rankings,last_x_games) {
   peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
 
   for(i in 1:last_x_games) {
-    this_ranking <- generate_rankings(all_games_inter, last_game - i, NULL)
+    this_ranking <- generate_rankings(all_games_inter, last_game - i, NULL, "inter")
     this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
     peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)
@@ -546,7 +567,7 @@ gen_peaks_high <- function(current_rankings,last_x_games) {
   peak_rankings <- peak_rankings[, c("nickname", "peak_rank")]
   
   for(i in 1:last_x_games) {
-    this_ranking <- generate_rankings(all_games_high, last_game - i, NULL)
+    this_ranking <- generate_rankings(all_games_high, last_game - i, NULL, "high")
     this_ranking <- this_ranking %>% dplyr::select(nickname, rank)
     peak_rankings <- merge(peak_rankings, this_ranking, by="nickname", all=TRUE)
     peak_rankings$peak_rank <- get_peak_vec(peak_rankings$peak_rank, peak_rankings$rank)

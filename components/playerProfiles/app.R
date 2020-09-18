@@ -316,7 +316,7 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
     updateProgress(detail = text)
     Sys.sleep(0.1)
   }
-  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=5, text=seq(14,28), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=5, text=seq(14,29), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
 
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db$gamescore, text=paste("<a href='https://logs.tf/",filtered_db$log_id,'#', steam_id, "'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
@@ -388,7 +388,7 @@ variable_performance_graph <- function(filtered_db, variable, last_game, player,
   } else {
     annot_y <- 0
   }
-  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=annot_y, text=seq(14,28), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=annot_y, text=seq(14,29), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
 
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db[[variable]], text=paste("<a href='https://logs.tf/",filtered_db$log_id,'#', steam_id, "'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
