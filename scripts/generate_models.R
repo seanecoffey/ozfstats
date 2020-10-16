@@ -54,7 +54,7 @@ damage_class_lm_multimap <- function(dataframe, y) {
 lm_variables <- c("dpm", "kad", "dtm", "deathspm", "cpm", "damageperdt", "kpm", "kd")
 damage_classes <- c("scout", "demoman", "soldier")
 all_maps <- c("granary", "product", "gullywash", "snakewater", "process",
-              "prolands", "logjam", "kalinka", "reckoner", "sunshine","metalworks","bagel")
+              "prolands", "logjam", "kalinka", "reckoner", "sunshine","metalworks","bagel", "villa")
 
 ##EXPONENTIAL MODELS - need to make sure models are fitting each variable correctly!
 damage_class_em <- function(dataframe, y, map) {
@@ -116,7 +116,7 @@ generate_models <- function(player.data) {
   }
 
   koth <- c("product","bagel")
-  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater")
+  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "villa")
   map_types <-c("koth", "cp")
 
   for (class in damage_classes) {
@@ -185,10 +185,10 @@ set_blank_exp <- function(class) {
 predict_stats <- function(class, class_name) {
   setwd()
   temp <- class
-  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product", "bagel")
+  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product", "bagel", "villa")
   allvars <- c("dpm", "kad", "dtm", "deathspm", "cpm", "damageperdt", "kpm", "damageperheal", "kd")
   for (map_name in tf2maps) {
-    if(map_name %in% c("kalinka", "reckoner","metalworks")) {
+    if(map_name %in% c("kalinka", "reckoner","metalworks", "villa")) {
       for(var in allvars) {
         new_var <- paste("exp_",var,sep="")
         lm_path <- paste("./data/models/",class_name,"/",class_name,"-","cp","-",var,".rds",sep="")

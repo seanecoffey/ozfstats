@@ -93,7 +93,7 @@ gamma_variables <- c("dpm", "kad", "dtm", "deathspm", "cpm", "damageperdt", "kpm
 gamma_variables_heals <- c("damageperheal")
 damage_classes <- c("scout", "demoman", "soldier")
 all_maps <- c("granary", "product", "gullywash", "snakewater", "process",
-              "prolands", "logjam", "kalinka", "reckoner", "sunshine","metalworks","bagel")
+              "prolands", "logjam", "kalinka", "reckoner", "sunshine","metalworks","bagel", "villa")
 
 
 ##Generate distributions
@@ -144,7 +144,7 @@ generate_dists <- function(player.data) {
   }
 
   koth <- c("product","bagel")
-  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater")
+  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "villa")
   map_types <-c("koth", "cp")
 
   for (class in damage_classes) {
@@ -183,7 +183,7 @@ generate_dists <- function(player.data) {
   }
 
   koth <- c("product", "bagel")
-  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater")
+  cp <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "villa")
   map_types <-c("koth", "cp")
   setwd()
   setwd(paste("./data/distributions/medic",sep=""))
@@ -199,10 +199,10 @@ generate_dists <- function(player.data) {
 ##percentile calcs
 percentile_stats <- function(class, class_name) {
   temp <- class
-  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product", "bagel")
+  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product", "bagel", "villa")
   allvars <- c("dpm", "kad", "dtm", "deathspm", "cpm", "damageperdt", "kpm", "damageperheal", "kd")
   for (map_name in tf2maps) {
-    if(map_name %in% c("kalinka", "reckoner","metalworks")) {
+    if(map_name %in% c("kalinka", "reckoner","metalworks", "villa")) {
       for(var in allvars) {
         new_var <- paste("perc_",var,sep="")
         setwd()
@@ -268,10 +268,10 @@ set_blank_med_exp <- function(class) {
 
 percentile_med_stats <- function(class, class_name) {
   temp <- class
-  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product","bagel")
+  tf2maps <- c("granary", "gullywash", "prolands", "logjam", "reckoner", "sunshine", "process", "metalworks", "kalinka", "snakewater", "product","bagel", "villa")
   med_vars <- c("kad", "chargespm","healing","cpm","dropspm","deathspm","dtm","ubersperheal","deathsperdt","dropsperuber")
   for (map_name in tf2maps) {
-    if(map_name %in% c("kalinka", "reckoner","metalworks")) {
+    if(map_name %in% c("kalinka", "reckoner","metalworks", "villa")) {
       for(var in med_vars) {
         new_var <- paste("perc_",var,sep="")
         setwd()
