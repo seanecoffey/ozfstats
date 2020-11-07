@@ -2,10 +2,10 @@
 library("dplyr")
 library("jsonlite")
 library("reactable")
-setwd("../../LogAnalyser")
-source(file="../Data/generate_models.R")
-source(file="../Data/generate_distributions.R")
-finals_adjust <- read.csv("../Data/finals_vars.csv")
+#setwd("../../LogAnalyser")
+source(file="../../scripts/generate_models.R")
+source(file="../../scripts/generate_distributions.R")
+finals_adjust <- read.csv("../../data/finals_vars.csv")
 
 ####----------------------- FUNCTIONS
 fetch_log <- function(log_id) {
@@ -323,7 +323,7 @@ ranking_column <- function(maxWidth = 100, class = NULL,...) {
 
 score_color <- make_color_pal(c("#ff2700", "#f4a770", "#edec9e", "#c0d292", "#35b0ab"), bias = 1)
 dump <- make_color_pal(c("#f14d4d", "#f4a770", "#edec9e", "#c0d292", "#35b0ab"), bias = 2)
-score_column <- function(maxWidth=100, class = NULL, minp = min_p, maxp = max_p, ...) {
+score_column <- function(maxWidth=100, class = NULL, minp = 0, maxp = 100, ...) {
   colDef(
     cell = format_pct,
     maxWidth = maxWidth,
@@ -405,10 +405,10 @@ generate_table <- function(log_id) {
                                  div(class = "spi-rating", style = list(background = color), value)
                                }
     ),
-    impact = score_column(header = (span("Impact", title = "Considers DPM, KA/D, K/D, KPM, HPM, CHARGES")), class = "border-left"),
-    survive = score_column(header = (span("Survivability", title = "Considers DT/M, DEATHS/M, DROPS/M"))),
-    efficiency = score_column(header = (span("Efficiency", title = "Considers D/DT, D/HR, DROPS/UBER, K/HR"))),
-    objective = score_column(header = (span("Objective", title = "Considers WIN-LOSS, GAME MARGIN, CAPS"))),
+    impact = score_column(header = (span("Impact", title = "Considers DPM, KA/D, K/D, KPM, HPM, CHARGES")), class = "border-left", minp = min_p, maxp = max_p),
+    survive = score_column(header = (span("Survivability", title = "Considers DT/M, DEATHS/M, DROPS/M")), minp = min_p, maxp = max_p),
+    efficiency = score_column(header = (span("Efficiency", title = "Considers D/DT, D/HR, DROPS/UBER, K/HR")), minp = min_p, maxp = max_p),
+    objective = score_column(header = (span("Objective", title = "Considers WIN-LOSS, GAME MARGIN, CAPS")), minp = min_p, maxp = max_p),
     class_primary = colDef(name="Class")
   ), class = "standings-table"
   )
