@@ -46,3 +46,6 @@ scripts/secrets.json
 data/models/
 data/distributions/
 .rds
+scripts/import/*.json
+scripts/import/*.pickle
+.env
