@@ -39,8 +39,8 @@ player.data <- dbFetch(res)
 ##Rename maps
 rename_maps <- function(dataframe) {
   dataframe[dataframe$map %in% c('cp_granary_pro_rc8','cp_granary_pro_b10', 'cp_granary_pro_rc3', 'cp_granary_pro_rc4'), ]$map <- 'granary'
-  dataframe[dataframe$map %in% c('cp_gullywash_final1'), ]$map <- 'gullywash'
-  dataframe[dataframe$map %in% c('cp_process_final', 'cp_Process_final'),]$map <- 'process'
+  dataframe[dataframe$map %in% c('cp_gullywash_final1', 'cp_gullywash_f2'), ]$map <- 'gullywash'
+  dataframe[dataframe$map %in% c('cp_process_final', 'cp_Process_final', 'cp_process_f7'),]$map <- 'process'
   dataframe[dataframe$map %in% c('koth_product_rc9','koth_product_rcx','cp_product_rcx','koth_product_rc8'),]$map <- 'product'
   dataframe[dataframe$map %in% c('cp_snakewater_final1','cp_snakewater_u13'),]$map <- 'snakewater'
   dataframe[dataframe$map %in% c('cp_kalinka_rc5'),]$map <- 'kalinka'

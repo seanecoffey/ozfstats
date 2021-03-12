@@ -248,7 +248,7 @@ ui <- fluidPage(
               )
               ),
               fluidRow(
-                column(width=2,selectizeInput("rankseasonfilter", label = "Season", choices = c(14:29),multiple=TRUE, width="100%")),
+                column(width=2,selectizeInput("rankseasonfilter", label = "Season", choices = c(14:30),multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankplayerfilter", label = "Player", choices = player_names ,multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankclassfilter", label = "Class", choices = c("scout", "soldier", "demoman", "medic"),multiple=TRUE, width="100%")),
                 column(width=2,selectizeInput("rankdivfilter", label="Division", choices = unique(season_ranks$div),multiple=TRUE, width="100%")),

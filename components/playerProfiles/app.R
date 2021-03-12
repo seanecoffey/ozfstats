@@ -5,14 +5,14 @@
 
 #PlayerProfiles
 library(shiny)
+library(shinyFeedback)
+library(shiny.semantic)
+options(shiny.usecairo=T)
 library(plotly)
 library(rlist)
 library(Cairo)
 library(reactable)
 library(dplyr)
-library(shinyFeedback)
-library(shiny.semantic)
-options(shiny.usecairo=T)
 
 ##LOAD
 player_names <- read.csv('../../data/players.csv')
@@ -284,12 +284,13 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
                            text = paste("Season ", filtered_db$season, " Week ", filtered_db$week, sep=""),
                            hovertemplate = paste(
                              "<b>%{text}</b><br>",
-                             sprintf("%s<br>", filtered_db$map),
-                             sprintf("<br>Game Score: %s<br>", round(filtered_db$gamescore),digits=3),
+                             sprintf("%s - %s<br>", filtered_db$map,filtered_db$class_primary),
+                             sprintf("<br> Game Score: %s<br>", round(filtered_db$gamescore),digits=3),
                              sprintf("Impact: %s<br>", round(100*filtered_db$impact), digits=3),
                              sprintf("Survivability: %s<br>", round(100*filtered_db$survive), digits=3),
                              sprintf("Efficiency: %s<br>", round(100*filtered_db$efficiency), digits=3),
                              sprintf("Objective: %s<br><br>", round(100*filtered_db$objective), digits=3),
+                             sprintf("<i>Log ID: %s</i><br>", filtered_db$log_id),
                              "<i>Click marker for logs.tf</i>"
                            )
   )
@@ -316,7 +317,7 @@ time_performance_graph <- function(filtered_db, variable, last_game, player, upd
     updateProgress(detail = text)
     Sys.sleep(0.1)
   }
-  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=5, text=seq(14,29), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
+  fig <- fig %>% add_annotations(x = seq(5,last_game+5,10), y=5, text=seq(14,30), showArrow=FALSE, xref="x", yref="y", ax=0, ay=0)
 
   fig <- fig %>% add_annotations(x =~filtered_db$ranking_game, y=~filtered_db$gamescore, text=paste("<a href='https://logs.tf/",filtered_db$log_id,'#', steam_id, "'>  </a>",sep=""), xref="x", yref="y", showarrow=FALSE, ax=0, ay=0)
 
@@ -360,12 +361,13 @@ variable_performance_graph <- function(filtered_db, variable, last_game, player,
                            text = paste("Season ", filtered_db$season, " Week ", filtered_db$week, sep=""),
                            hovertemplate = paste(
                              "<b>%{text}</b><br>",
-                             sprintf("%s<br>", filtered_db$map),
-                             sprintf("<br>Game Score: %s<br>", round(filtered_db$gamescore),digits=3),
+                             sprintf("%s - %s<br>", filtered_db$map,filtered_db$class_primary),
+                             sprintf("<br> Game Score: %s<br>", round(filtered_db$gamescore),digits=3),
                              sprintf("Impact: %s<br>", round(100*filtered_db$impact), digits=3),
                              sprintf("Survivability: %s<br>", round(100*filtered_db$survive), digits=3),
                              sprintf("Efficiency: %s<br>", round(100*filtered_db$efficiency), digits=3),
                              sprintf("Objective: %s<br><br>", round(100*filtered_db$objective), digits=3),
+                             sprintf("<i>Log ID: %s</i><br>", filtered_db$log_id),
                              "<i>Click marker for logs.tf</i>"
                            )
   )
@@ -549,7 +551,13 @@ ui <- function(req) {
                )
              )
     ),
-    br(),
+    hr(),
+    ##CV & AWARDS PANEL
+    fluidRow(
+      column(12,
+             div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/lightning-bolt.png"), "Awards & Peak Stats - Coming Soon")),
+             ), align = "center"
+    ),
 
     ##MAIN PANEL
     fluidRow(
@@ -574,7 +582,7 @@ ui <- function(req) {
                ),
                tabPanel("Plot Stats",
                         br(),
-                        selectInput('yVar', 'Y-Variable', choices = plot_stat_choices, selected='kills'),
+                        shiny::selectInput('yVar', 'Y-Variable', choices = plot_stat_choices, selected='kills'),
                         plotlyOutput('variable_graph')
                )
              )
@@ -616,11 +624,11 @@ server <- function(input, output, session) {
 
   ##Render UI Filters
   output$nameSelect <- renderUI({
-    selectInput('player', 'Player',choices=names, multiple = F, selected=NULL)
+    shiny::selectInput('player', 'Player',choices=names, multiple = F, selected="Elmo.")
   })
 
   output$classSelectFilter <- renderUI({
-    selectInput('classFilter', 'Class', choices = c(
+    shiny::selectInput('classFilter', 'Class', choices = c(
       'All',
       'scout',
       'soldier',
@@ -630,7 +638,7 @@ server <- function(input, output, session) {
   })
 
   output$divisionSelectFilter <- renderUI({
-    selectInput('divisionFilter', 'Division', choices = c(
+    shiny::selectInput('divisionFilter', 'Division', choices = c(
       'All',
       'Premier' = 'prem',
       'High' = 'high',

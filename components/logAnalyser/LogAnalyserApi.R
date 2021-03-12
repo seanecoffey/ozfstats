@@ -34,7 +34,7 @@ map_rename <- function(full_name) {
     return("granary")
   } else if(full_name %in% c('cp_gullywash_final1')) {
     return("gullywash")
-  } else if(full_name %in% c('cp_process_final')) {
+  } else if(full_name %in% c('cp_process_final', 'cp_process_f7')) {
     return("process")
   } else if(full_name %in% c('koth_product_rc9','koth_product_rcx','cp_product_rcx','koth_product_rc8')) {
     return("product")

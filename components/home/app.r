@@ -55,7 +55,7 @@ db_summarised <- db %>% dplyr::filter(div=="prem") %>% dplyr::group_by(nickname)
   damage_taken = sum(dtm*mins_total)
 )
 
-db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==29) %>% dplyr::summarize(
+db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==30) %>% dplyr::summarize(
   count = n(),
   kills = sum(kills),
   dpm = mean(dpm),
@@ -927,23 +927,6 @@ ui <- fluidPage(
                   column(3,
                          div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/lightning-bolt.png"), "Charges")),
                          reactableOutput("premseasonubers"))
-         ),
-         fluidRow(column(width=12,
-                         div(class = "title", h1(paste("Season ", currentseason, " High Division Leaders", sep="")))
-              ), align = "center"
-         ),
-         fluidRow(column(3,
-                         div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/accuracy.png"), "Kills")),
-                         reactableOutput("highseasonkills")),
-                  column(3,
-                         div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/helping-hand.png"), "Assists")),
-                         reactableOutput("highseasonassists")),
-                  column(3,
-                         div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/explosion.png"), "Damage")),
-                         reactableOutput("highseasondamage")),
-                  column(3,
-                         div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/lightning-bolt.png"), "Charges")),
-                         reactableOutput("highseasonubers"))
          ),
          fluidRow(column(width=12,
                          div(class = "title", h1(paste("Season ", currentseason, " Intermediate Division Leaders", sep="")))
