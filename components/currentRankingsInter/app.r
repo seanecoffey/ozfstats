@@ -184,7 +184,7 @@ gen_ranking_table <- function(updateProgress = NULL){
                                  }
                                  ),
       prev_rank = colDef(show=FALSE),
-      career_avg = ranking_column(header = (span("Avg Pts. (No Weight/Decay)", title = "Averge ranking points per game BEFORE old game decay and participation weighting")), format = colFormat(digits=1),
+      career_avg = ranking_column(header = (span("Raw Average (2 Seasons)", title = "Averge ranking points per game BEFORE old game decay and participation weighting")), format = colFormat(digits=1),
                                   cell = function(value) {
                                     scaled <- (value - min(current_rankings$career_avg)) / (max(current_rankings$career_avg) - min(current_rankings$career_avg))
                                     color <- ranking_color(scaled)

@@ -51,6 +51,7 @@ rename_maps <- function(dataframe) {
   dataframe[dataframe$map %in% c('cp_reckoner_rc6','cp_reckoner_rc4a','cp_reckoner_rc5','cp_reckoner_b2a','cp_reckoner_b3a','cp_reckoner_rc1','cp_reckoner_rc2'),]$map <- 'reckoner'
   dataframe[dataframe$map %in% c('koth_bagel_fall_b3'),]$map <- 'bagel'
   tryCatch({ dataframe[dataframe$map %in% c('cp_villa_b16a'),]$map <- 'villa'}, error = function(err) {print(err)}, finally = {})
+  tryCatch({ dataframe[dataframe$map %in% c('koth_clearcut_b15d'),]$map <- 'clearcut'}, error = function(err) {print(err)}, finally = {})
   return(dataframe)
 }
 

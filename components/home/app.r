@@ -55,7 +55,7 @@ db_summarised <- db %>% dplyr::filter(div=="prem") %>% dplyr::group_by(nickname)
   damage_taken = sum(dtm*mins_total)
 )
 
-db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==30) %>% dplyr::summarize(
+db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==31) %>% dplyr::summarize(
   count = n(),
   kills = sum(kills),
   dpm = mean(dpm),
@@ -947,7 +947,7 @@ ui <- fluidPage(
          ),
          br(),
          fluidRow(column(width=12,
-                         div(class = "title", h1("Premier Division Career Leaders (S14 Onwards)"))
+                         div(class = "title", h1("Premier Division Career Leaders"))
                          ), align = "center"
                   ),
          fluidRow(column(3,
