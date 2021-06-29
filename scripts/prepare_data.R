@@ -86,7 +86,16 @@ db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==31)
   total_caps = sum(cpm*mins_total),
   season_kd = sum(kills)/sum(deaths)
 )
+
+
+## Semantic Dash
+semantic_dash <- as.data.frame(0)
+semantic_dash$no_seasons <- length(unique(db$season))
+semantic_dash$no_maps <- length(unique(db$log_id))
+semantic_dash$no_players <- length(unique(db$nickname))
+
 setwd()
 setwd("./data")
 write.csv(db_season, "home_db_season.csv")
 write.csv(db_summarised, "home_db_summarised.csv")
+write.csv(semantic_dash, "home_semantic_dash.csv")

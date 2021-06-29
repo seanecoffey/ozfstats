@@ -14,6 +14,7 @@ load_database <- function() {
 }
 db_summarised <- read.csv('../../data/home_db_summarised.csv')
 db_season <- read.csv('../../data/home_db_season.csv')
+db_semantic <- read.csv('../../data/home_semantic_dash.csv')
 
 calc_wins <- function(database) {
   database$win <- NA
@@ -1342,19 +1343,19 @@ server <- function(input,output,session) {
     semanticPage(
       div(class = "ui statistics  statistic-bottom",
           div(class = "blue statistic statistic-even",
-              div(class = "value", length(unique(db$season))),
+              div(class = "value", db_semantic$no_seasons),
               div(class = "label", "Seasons")
           ),
           div(class = "teal statistic statistic-even",
-              div(class = "value", format(round(as.numeric(length(unique(db$log_id)))/2.061417, 0), nsmall=0, big.mark=",")),
+              div(class = "value", format(round(as.numeric(db_semantic$no_maps)/2.061417, 0), nsmall=0, big.mark=",")),
               div(class = "label", "Matches")
           ),
           div(class = "purple statistic statistic-even",
-              div(class = "value", format(round(as.numeric(length(unique(db$log_id))), 1), nsmall=0, big.mark=",")),
+              div(class = "value", format(round(as.numeric(db_semantic$no_maps), 1), nsmall=0, big.mark=",")),
               div(class = "label", "Maps")
           ),
           div(class = "pink statistic statistic-even",
-              div(class = "value", length(unique(db$nickname))),
+              div(class = "value", db_semantic$no_players),
               div(class = "label", "Players")
           )
       )
