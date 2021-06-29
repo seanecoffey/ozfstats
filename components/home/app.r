@@ -2,12 +2,7 @@
 library(shiny)
 library(Cairo)
 library(dplyr)
-library("dqshiny")
-library("reactable")
-library("plotly")
-library(htmltools)
-library(knitr)
-library(rmarkdown)
+library(reactable)
 library(waiter)
 library(shiny.semantic)
 options(shiny.usecairo=T)
@@ -17,7 +12,8 @@ load_database <- function() {
   db <- read.csv('../../data/detailed_stats.csv')
   return(db)
 }
-db <- load_database()
+db_summarised <- read.csv('../../data/home_db_summarised.csv')
+db_season <- read.csv('../../data/home_db_season.csv')
 
 calc_wins <- function(database) {
   database$win <- NA
@@ -33,46 +29,7 @@ calc_wins <- function(database) {
   return(database)
 }
 
-db <- calc_wins(db)
-
-db_summarised <- db %>% dplyr::filter(div=="prem") %>% dplyr::group_by(nickname) %>% dplyr::summarize(
-  count = n(),
-  kills = sum(kills),
-  dpm = mean(dpm),
-  assists = sum(assists),
-  deaths = sum(deaths),
-  gamescore = mean(gamescore),
-  ubers = sum(ubers),
-  drops = sum(drops),
-  playoffs = sum(final),
-  total_minutes = sum(mins_total),
-  kills_per_map = sum(kills)/n(),
-  deaths_per_map = sum(deaths)/n(),
-  total_damage = sum(dpm*mins_total),
-  total_caps = sum(cpm*mins_total),
-  career_kd = sum(kills)/sum(deaths),
-  wins = sum(win),
-  damage_taken = sum(dtm*mins_total)
-)
-
-db_season <- db %>% dplyr::group_by(nickname, div) %>% dplyr::filter(season==31) %>% dplyr::summarize(
-  count = n(),
-  kills = sum(kills),
-  dpm = mean(dpm),
-  assists = sum(assists),
-  deaths = sum(deaths),
-  gamescore = mean(gamescore),
-  ubers = sum(ubers),
-  drops = sum(drops),
-  playoffs = sum(final),
-  total_minutes = sum(mins_total),
-  kills_per_map = sum(kills)/n(),
-  deaths_per_map = sum(deaths)/n(),
-  total_damage = sum(dpm*mins_total),
-  total_caps = sum(cpm*mins_total),
-  season_kd = sum(kills)/sum(deaths)
-)
-
+#Get current season + week (~40kb load)
 gamedata <- read.csv("../../data/gamedata.csv")
 gamedata<-gamedata[order(-gamedata$season,-gamedata$week),]
 currentseason<-head(gamedata,1)$season
@@ -123,7 +80,7 @@ gen_count_table <- function(updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -190,7 +147,7 @@ gen_kill_table <- function(the_database, updateProgress = NULL){
                                   htmltools::tags$img(src='second.png'),
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -257,7 +214,7 @@ gen_damage_table <- function(the_database, updateProgress = NULL){
                                   htmltools::tags$img(src='second.png'),
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -324,7 +281,7 @@ gen_damage_taken_table <- function(the_database, updateProgress = NULL){
                                   htmltools::tags$img(src='second.png'),
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -391,7 +348,7 @@ gen_wins_table <- function(the_database, updateProgress = NULL){
                                   htmltools::tags$img(src='second.png'),
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -458,7 +415,7 @@ gen_playoffs_table <- function(the_database, updateProgress = NULL){
                                   htmltools::tags$img(src='second.png'),
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -525,7 +482,7 @@ gen_mins_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -592,7 +549,7 @@ gen_uber_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -659,7 +616,7 @@ gen_death_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -726,7 +683,7 @@ gen_assist_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -793,7 +750,7 @@ gen_capture_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -860,7 +817,7 @@ gen_drop_table <- function(the_database, updateProgress = NULL){
                               div(class = "player-name",
                                   htmltools::tags$a(href = profile_url, target = "_blank", value))
                             )
-                            
+
                           } else if (index == 3) {
                             div(
                               class = "name",
@@ -963,7 +920,7 @@ ui <- fluidPage(
                          div(class = "title", h2(htmltools::img(src="https://img.icons8.com/nolan/64/diamond.png"), "Playoffs")),
                          reactableOutput("careerplayoffs"))
                   ),
-         
+
          fluidRow(
                   column(3,
                           div(class = "title", h2(htmltools::tags$img(src="https://img.icons8.com/nolan/64/accuracy.png"), "Kills")),
@@ -1006,11 +963,11 @@ ui <- fluidPage(
 
 ## SERVER
 server <- function(input,output,session) {
-  
+
   output$edit_date <- renderText({
     paste("Rankings as at end of Season ",currentseason, " week ", currentweek, ". Last update was at: ", toString(file.info("../../data/current_rankings.csv")$mtime), sep="")
   })
-  
+
   output$careermaps <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
@@ -1025,12 +982,12 @@ server <- function(input,output,session) {
     }
     gen_count_table(updateProgress)
     })
-  
+
   output$careerkills <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1040,12 +997,12 @@ server <- function(input,output,session) {
     }
     gen_kill_table(db_summarised, updateProgress)
   })
-  
+
   output$careerminutes <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1055,12 +1012,12 @@ server <- function(input,output,session) {
     }
     gen_mins_table(db_summarised, updateProgress)
   })
-  
+
   output$careerubers <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1070,12 +1027,12 @@ server <- function(input,output,session) {
     }
     gen_uber_table(db_summarised, updateProgress)
   })
-  
+
   output$careerdeaths <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1085,12 +1042,12 @@ server <- function(input,output,session) {
     }
     gen_death_table(db_summarised, updateProgress)
   })
-  
+
   output$careerwins <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1100,12 +1057,12 @@ server <- function(input,output,session) {
     }
     gen_wins_table(db_summarised, updateProgress)
   })
-  
+
   output$careerplayoffs <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1115,12 +1072,12 @@ server <- function(input,output,session) {
     }
     gen_playoffs_table(db_summarised, updateProgress)
   })
-  
+
   output$careerassists <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1130,12 +1087,12 @@ server <- function(input,output,session) {
     }
     gen_assist_table(db_summarised, updateProgress)
   })
-  
+
   output$careerdamage <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1145,12 +1102,12 @@ server <- function(input,output,session) {
     }
     gen_damage_table(db_summarised, updateProgress)
   })
-  
+
   output$careerdamagetaken <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1160,12 +1117,12 @@ server <- function(input,output,session) {
     }
     gen_damage_taken_table(db_summarised, updateProgress)
   })
-  
+
   output$careercaptures <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1175,13 +1132,13 @@ server <- function(input,output,session) {
     }
     gen_capture_table(db_summarised, updateProgress)
   })
-  
-  
+
+
   output$careerdrops <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1191,14 +1148,14 @@ server <- function(input,output,session) {
     }
     gen_drop_table(db_summarised, updateProgress)
   })
-  
+
   ##PREM SEASON
-  
+
   output$premseasonkills <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1208,12 +1165,12 @@ server <- function(input,output,session) {
     }
     gen_kill_table(db_season %>% dplyr::filter(div=="prem") %>% dplyr::ungroup() , updateProgress)
   })
-  
+
   output$premseasondamage <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1223,13 +1180,13 @@ server <- function(input,output,session) {
     }
     gen_damage_table(db_season %>% dplyr::filter(div=="prem") %>% dplyr::ungroup(), updateProgress)
   })
-  
-  
+
+
   output$premseasonassists <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1239,12 +1196,12 @@ server <- function(input,output,session) {
     }
     gen_assist_table(db_season %>% dplyr::filter(div=="prem") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   output$premseasonubers <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1254,13 +1211,13 @@ server <- function(input,output,session) {
     }
     gen_uber_table(db_season %>% dplyr::filter(div=="prem") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   ##HIGH STATS
   output$highseasonkills <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1270,12 +1227,12 @@ server <- function(input,output,session) {
     }
     gen_kill_table(db_season %>% dplyr::filter(div=="high") %>% dplyr::ungroup() , updateProgress)
   })
-  
+
   output$highseasondamage <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1285,13 +1242,13 @@ server <- function(input,output,session) {
     }
     gen_damage_table(db_season %>% dplyr::filter(div=="high") %>% dplyr::ungroup(), updateProgress)
   })
-  
-  
+
+
   output$highseasonassists <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1301,12 +1258,12 @@ server <- function(input,output,session) {
     }
     gen_assist_table(db_season %>% dplyr::filter(div=="high") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   output$highseasonubers <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1316,13 +1273,13 @@ server <- function(input,output,session) {
     }
     gen_uber_table(db_season %>% dplyr::filter(div=="high") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   ##INTER STATS
   output$interseasonkills <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1332,12 +1289,12 @@ server <- function(input,output,session) {
     }
     gen_kill_table(db_season %>% dplyr::filter(div=="inter") %>% dplyr::ungroup() , updateProgress)
   })
-  
+
   output$interseasondamage <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1347,13 +1304,13 @@ server <- function(input,output,session) {
     }
     gen_damage_table(db_season %>% dplyr::filter(div=="inter") %>% dplyr::ungroup(), updateProgress)
   })
-  
-  
+
+
   output$interseasonassists <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1363,12 +1320,12 @@ server <- function(input,output,session) {
     }
     gen_assist_table(db_season %>% dplyr::filter(div=="inter") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   output$interseasonubers <- renderReactable({
     progress <- shiny::Progress$new()
     progress$set(message = "Loading...", value = 0)
     on.exit(progress$close())
-    
+
     updateProgress <- function(value = NULL, detail = NULL) {
       if(is.null(value)) {
         value <- progress$getValue()
@@ -1378,9 +1335,9 @@ server <- function(input,output,session) {
     }
     gen_uber_table(db_season %>% dplyr::filter(div=="inter") %>% dplyr::ungroup(), updateProgress)
   })
-  
+
   ##OTHER
-  
+
   output$statRow <- renderUI({
     semanticPage(
       div(class = "ui statistics  statistic-bottom",
@@ -1403,7 +1360,7 @@ server <- function(input,output,session) {
       )
     )
   })
-  
+
   output$careerDivider <- renderUI({
     semanticPage(
       div(class = "ui horizontal divider header",
@@ -1411,7 +1368,7 @@ server <- function(input,output,session) {
           )
     )
   })
-  
+
 }
 
 shinyApp(ui, server)
