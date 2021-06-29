@@ -263,7 +263,7 @@ allmedicFilter <- allMedic %>% filter(total_mins_played > 119)
 #temp translation in lieu of normalisation
 temp<-allmedicFilter[(allmedicFilter$season == 20) | (allmedicFilter$season == 19) | (allmedicFilter$season == 18) | (allmedicFilter$season == 17) | (allmedicFilter$season == 13) |  (allmedicFilter$season == 12)  ,]
 temp1<-allmedicFilter[(allmedicFilter$season == 21),]
-temp2<-allmedicFilter[(allmedicFilter$season == 22) | (allmedicFilter$season == 23) | (allmedicFilter$season == 24) | (allmedicFilter$season == 25) | (allmedicFilter$season == 26) | (allmedicFilter$season == 27) | (allmedicFilter$season == 28)| (allmedicFilter$season == 29)| (allmedicFilter$season == 30)| (allMedicFilter$season == 31)   ,]
+temp2<-allmedicFilter[(allmedicFilter$season == 22) | (allmedicFilter$season == 23) | (allmedicFilter$season == 24) | (allmedicFilter$season == 25) | (allmedicFilter$season == 26) | (allmedicFilter$season == 27) | (allmedicFilter$season == 28)| (allmedicFilter$season == 29)| (allmedicFilter$season == 30)| (allmedicFilter$season == 31)   ,]
 temp3<-allmedicFilter[(allmedicFilter$season == 16), ]
 temp4<-allmedicFilter[(allmedicFilter$season == 15), ]
 temp5<-allmedicFilter[(allmedicFilter$season == 14), ]
